@@ -20,6 +20,7 @@ export const metadata: Metadata = {
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Newsletter from '@/components/Newsletter';
+import AOSInit from '@/components/AOSInit';
 
 export default function RootLayout({
   children,
@@ -29,6 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
+        <AOSInit />
         <Header />
         {children}
         <Newsletter />
