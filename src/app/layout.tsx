@@ -19,6 +19,7 @@ export const metadata: Metadata = {
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import Newsletter from '@/components/Newsletter';
 
 export default function RootLayout({
   children,
@@ -30,6 +31,7 @@ export default function RootLayout({
       <body>
         <Header />
         {children}
+        <Newsletter />
         <Footer />
       </body>
     </html>

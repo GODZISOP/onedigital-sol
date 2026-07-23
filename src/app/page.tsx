@@ -6,7 +6,6 @@ import Banner from '@/components/Banner';
 import PopularItems from '@/components/PopularItems';
 import Cheer from '@/components/Cheer';
 import Testimonial from '@/components/Testimonial';
-import Newsletter from '@/components/Newsletter';
 import ScrollReveal from '@/components/ScrollReveal';
 
 export default function Home() {
@@ -31,9 +30,6 @@ export default function Home() {
         </ScrollReveal>
         <ScrollReveal>
           <Testimonial />
-        </ScrollReveal>
-        <ScrollReveal>
-          <Newsletter />
         </ScrollReveal>
       </main>
     </>
