@@ -89,4 +89,15 @@
   .title {
     font-size: 3rem;
   }
+  .ctaGroup {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .primaryButton {
+    padding: 0.8rem 1.5rem;
+    white-space: nowrap;
+  }
+  .secondaryLink {
+    white-space: nowrap;
+  }
 }

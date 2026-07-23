@@ -20,9 +20,23 @@ export default function Header() {
 
         <nav className={styles.nav}>
           <Link href="/" className={styles.navItem}>Home</Link>
-          <Link href="/products" className={styles.navItem}>
-            Products <ChevronDown size={16} />
-          </Link>
+          <div className={styles.navItemWithDropdown}>
+            <Link href="/products" className={styles.navItem}>
+              Products <ChevronDown size={16} />
+            </Link>
+            <div className={styles.dropdownMenu}>
+              <Link href="/products/badger-sportswear" className={styles.dropdownItem}>Badger Sportswear</Link>
+              <Link href="/products/carolina-made" className={styles.dropdownItem}>Carolina Made</Link>
+              <Link href="/products/champro-sports" className={styles.dropdownItem}>Champro Sports</Link>
+              <Link href="/products/company-casuals" className={styles.dropdownItem}>Company Casuals</Link>
+              <Link href="/products/discount-trophy" className={styles.dropdownItem}>Discount Trophy</Link>
+              <Link href="/products/high5-sportswear" className={styles.dropdownItem}>High5 Sportswear</Link>
+              <Link href="/products/pacific-headwear" className={styles.dropdownItem}>Pacific Headwear</Link>
+              <Link href="/products/richardson-caps" className={styles.dropdownItem}>Richardson Caps</Link>
+              <Link href="/products/teamwork-apparel" className={styles.dropdownItem}>Teamwork Apparel</Link>
+              <Link href="/products/rothco" className={styles.dropdownItem}>Rothco</Link>
+            </div>
+          </div>
           <Link href="/about" className={styles.navItem}>About</Link>
           <Link href="/contact" className={styles.navItem}>Contact</Link>
         </nav>
