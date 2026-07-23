@@ -12,7 +12,18 @@ export default function Newsletter() {
   return (
     <>
       <div className={styles.galleryStrip}>
-        <Image src="/newsletter-gallery.png" alt="Sports Teams" fill style={{ objectFit: 'cover' }} />
+        <div className={styles.galleryImage}>
+          <Image src="/gallery1.png" alt="Gallery 1" fill style={{ objectFit: 'cover' }} />
+        </div>
+        <div className={styles.galleryImage}>
+          <Image src="/gallery2.png" alt="Gallery 2" fill style={{ objectFit: 'cover' }} />
+        </div>
+        <div className={styles.galleryImage}>
+          <Image src="/gallery3.png" alt="Gallery 3" fill style={{ objectFit: 'cover' }} />
+        </div>
+        <div className={styles.galleryImage}>
+          <Image src="/gallery4.png" alt="Gallery 4" fill style={{ objectFit: 'cover' }} />
+        </div>
         <button className={styles.backToTop} onClick={scrollToTop} aria-label="Back to top">
           <ChevronUp size={24} color="white" />
         </button>
