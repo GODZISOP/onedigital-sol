@@ -22,8 +22,7 @@
 .backToTop {
   position: absolute;
   right: 5%;
-  bottom: 0;
-  transform: translateY(50%);
+  top: -40px;
   background-color: #007bff;
   border: none;
   width: 40px;

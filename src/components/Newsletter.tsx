@@ -13,6 +13,9 @@ export default function Newsletter() {
     <>
       <div className={styles.galleryStrip}>
         <Image src="/newsletter-gallery.png" alt="Sports Teams" fill style={{ objectFit: 'cover' }} />
+        <button className={styles.backToTop} onClick={scrollToTop} aria-label="Back to top">
+          <ChevronUp size={24} color="white" />
+        </button>
       </div>
       <section className={styles.newsletterSection}>
         <div className={styles.content}>
@@ -24,9 +27,6 @@ export default function Newsletter() {
             </button>
           </form>
         </div>
-        <button className={styles.backToTop} onClick={scrollToTop} aria-label="Back to top">
-          <ChevronUp size={24} color="white" />
-        </button>
       </section>
     </>
   );
