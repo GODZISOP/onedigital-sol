@@ -31,6 +31,10 @@ export default function Testimonial() {
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const minSwipeDistance = 50;
 
   const nextTestimonial = () => {
     setCurrentIndex((prev) => (prev + 1) % testimonials.length);
@@ -42,6 +46,26 @@ export default function Testimonial() {
 
   const setTestimonial = (index: number) => {
     setCurrentIndex(index);
+  };
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEndEvent = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    
+    if (distance > minSwipeDistance) {
+      nextTestimonial();
+    } else if (distance < -minSwipeDistance) {
+      prevTestimonial();
+    }
   };
 
   const current = testimonials[currentIndex];
@@ -58,7 +82,12 @@ export default function Testimonial() {
             <ChevronLeft size={24} />
           </button>
           
-          <div className={styles.sliderContainer}>
+          <div 
+            className={styles.sliderContainer}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEndEvent}
+          >
             <div className={styles.sliderTrack} style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
               {testimonials.map((t) => (
                 <div key={t.id} className={styles.testimonialSlide}>

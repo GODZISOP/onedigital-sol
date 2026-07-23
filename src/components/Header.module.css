@@ -5,6 +5,9 @@
   padding: 1rem 4rem;
   background-color: white;
   border-bottom: 1px solid #eaeaea;
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
 
 .logo img {
