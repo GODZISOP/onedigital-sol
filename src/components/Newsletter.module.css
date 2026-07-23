@@ -1,0 +1,101 @@
+.galleryStrip {
+  display: flex;
+  width: 100%;
+  height: 250px;
+  position: relative;
+}
+
+.galleryImage {
+  flex: 1;
+  position: relative;
+}
+
+.newsletterSection {
+  background-color: #222;
+  color: white;
+  padding: 4rem 5%;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.backToTop {
+  position: absolute;
+  right: 5%;
+  bottom: 0;
+  transform: translateY(50%);
+  background-color: #007bff;
+  border: none;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: opacity 0.2s;
+}
+
+.backToTop:hover {
+  opacity: 0.8;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1200px;
+  gap: 2rem;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  max-width: 400px;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.form {
+  display: flex;
+  flex: 1;
+  max-width: 500px;
+  height: 50px;
+}
+
+.input {
+  flex: 1;
+  background-color: transparent;
+  border: 1px solid #555;
+  color: white;
+  padding: 0 1.5rem;
+  font-size: 1rem;
+  outline: none;
+}
+
+.input::placeholder {
+  color: #999;
+}
+
+.button {
+  width: 70px;
+  background-color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s;
+}
+
+.button:hover {
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .content {
+    flex-direction: column;
+    text-align: center;
+  }
+}
