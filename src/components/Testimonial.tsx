@@ -53,8 +53,8 @@ export default function Testimonial() {
       <div className={styles.container}>
         <h2 className={styles.title}>CLIENTS FEEDBACK</h2>
         
-        <div className={styles.content}>
-          <button className={styles.navButton} aria-label="Previous" onClick={prevTestimonial}>
+        <div className={styles.carousel}>
+          <button className={styles.arrow} aria-label="Previous" onClick={prevTestimonial}>
             <ChevronLeft size={24} />
           </button>
           
@@ -67,16 +67,14 @@ export default function Testimonial() {
               {current.quote}
             </p>
             
-            <div className={styles.authorBox}>
-              <h4 className={styles.author}>{current.name}</h4>
-              <p className={styles.role}>{current.role}</p>
-            </div>
+            <div className={styles.author}>{current.name}</div>
+            <div className={styles.role}>{current.role}</div>
             
             <div className={styles.dots}>
               {testimonials.map((_, index) => (
                 <span 
                   key={index} 
-                  className={`${styles.dot} ${index === currentIndex ? styles.active : ''}`}
+                  className={`${styles.dot} ${index === currentIndex ? styles.dotActive : ''}`}
                   onClick={() => setTestimonial(index)}
                   style={{ cursor: 'pointer' }}
                 ></span>
@@ -84,7 +82,7 @@ export default function Testimonial() {
             </div>
           </div>
           
-          <button className={styles.navButton} aria-label="Next" onClick={nextTestimonial}>
+          <button className={styles.arrow} aria-label="Next" onClick={nextTestimonial}>
             <ChevronRight size={24} />
           </button>
         </div>
