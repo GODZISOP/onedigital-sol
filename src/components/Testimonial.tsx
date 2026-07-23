@@ -9,23 +9,23 @@ export default function Testimonial() {
   const testimonials = [
     {
       id: 1,
-      name: "Jane Smith",
-      role: "Designer",
-      quote: "This service completely transformed how we handle our apparel design! Highly recommended for anyone looking for premium quality.",
+      name: "John Doe",
+      role: "CEO",
+      quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.",
       image: "/testimonial-avatar.png"
     },
     {
       id: 2,
-      name: "Sarah Jenkins",
-      role: "Creative Director",
-      quote: "I've never worked with a team this responsive and talented. The final products were perfectly on brand.",
+      name: "John Doe",
+      role: "CEO",
+      quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.",
       image: "/testimonial2.png"
     },
     {
       id: 3,
-      name: "Michael Chen",
-      role: "Founder",
-      quote: "Absolutely blown away by the attention to detail. Fast delivery and stellar communication throughout the whole process.",
+      name: "John Doe",
+      role: "CEO",
+      quote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.",
       image: "/testimonial3.png"
     }
   ];
@@ -58,17 +58,23 @@ export default function Testimonial() {
             <ChevronLeft size={24} />
           </button>
           
-          <div className={styles.testimonialBody}>
-            <div className={styles.avatar}>
-              <Image src={current.image} alt={current.name} fill style={{ objectFit: 'cover' }} />
+          <div className={styles.sliderContainer}>
+            <div className={styles.sliderTrack} style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
+              {testimonials.map((t) => (
+                <div key={t.id} className={styles.testimonialSlide}>
+                  <div className={styles.avatar}>
+                    <Image src={t.image} alt={t.name} fill style={{ objectFit: 'cover' }} />
+                  </div>
+                  
+                  <p className={styles.quote}>
+                    {t.quote}
+                  </p>
+                  
+                  <div className={styles.author}>{t.name}</div>
+                  <div className={styles.role}>{t.role}</div>
+                </div>
+              ))}
             </div>
-            
-            <p className={styles.quote}>
-              {current.quote}
-            </p>
-            
-            <div className={styles.author}>{current.name}</div>
-            <div className={styles.role}>{current.role}</div>
             
             <div className={styles.dots}>
               {testimonials.map((_, index) => (
