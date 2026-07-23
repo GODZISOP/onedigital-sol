@@ -25,7 +25,7 @@ export default function Header() {
               Products <ChevronDown size={16} />
             </Link>
             <div className={styles.dropdownMenu}>
-              <Link href="/products/badger-sportswear" className={styles.dropdownItem}>Badger Sportswear</Link>
+              <Link href="https://www.momentecbrands.com/" target="_blank" rel="noopener noreferrer" className={styles.dropdownItem}>Badger Sportswear</Link>
               <Link href="https://www.carolinamade.com/cgi-bin/live/wam_tmpl/marketing.p?site=CMD&layout=Base_b2b&page=homepage" target="_blank" rel="noopener noreferrer" className={styles.dropdownItem}>Carolina Made</Link>
               <Link href="https://shop.champrosports.com/" target="_blank" rel="noopener noreferrer" className={styles.dropdownItem}>Champro Sports</Link>
               <Link href="https://www.companycasuals.com/eastcoastdesigns/start.jsp" target="_blank" rel="noopener noreferrer" className={styles.dropdownItem}>Company Casuals</Link>

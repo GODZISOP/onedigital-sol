@@ -1,8 +1,9 @@
 .footer {
   background-color: #000;
   color: white;
-  padding: 5rem 5%;
   border-top: 1px solid #1a1a1a;
+  display: flex;
+  flex-direction: column;
 }
 
 .grid {
@@ -11,6 +12,8 @@
   gap: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  padding: 5rem 5%;
+  width: 100%;
 }
 
 .column {
@@ -78,4 +81,37 @@
   .grid {
     grid-template-columns: 1fr;
   }
+}
+
+.bottomBar {
+  position: relative;
+  background-color: #0a0a0a;
+  padding: 1.25rem 5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid #1a1a1a;
+}
+
+.copyright {
+  color: white;
+  font-size: 0.85rem;
+}
+
+.backToTop {
+  position: absolute;
+  right: 5%;
+  background-color: #007bff;
+  border: none;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.backToTop:hover {
+  opacity: 0.8;
 }

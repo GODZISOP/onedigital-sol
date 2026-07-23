@@ -24,9 +24,6 @@ export default function Newsletter() {
         <div className={styles.galleryImage}>
           <Image src="/gallery4_new.jpg" alt="Gallery 4" fill style={{ objectFit: 'cover' }} />
         </div>
-        <button className={styles.backToTop} onClick={scrollToTop} aria-label="Back to top">
-          <ChevronUp size={24} color="white" />
-        </button>
       </div>
       <section className={styles.newsletterSection}>
         <div className={styles.content}>
