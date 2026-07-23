@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import Image from 'next/image';
 import styles from './Products.module.css';
 
@@ -81,7 +79,6 @@ export default function ProductsPage() {
 
   return (
     <>
-      <Header />
       <main className={styles.container}>
         {/* SIDEBAR */}
         <aside className={styles.sidebar}>
@@ -194,7 +191,6 @@ export default function ProductsPage() {
           </div>
         </section>
       </main>
-      <Footer />
     </>
   );
 }

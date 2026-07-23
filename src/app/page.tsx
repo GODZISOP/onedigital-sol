@@ -7,17 +7,13 @@ import PopularItems from '@/components/PopularItems';
 import Cheer from '@/components/Cheer';
 import Testimonial from '@/components/Testimonial';
 import Newsletter from '@/components/Newsletter';
-import Footer from '@/components/Footer';
 import ScrollReveal from '@/components/ScrollReveal';
 
 export default function Home() {
   return (
     <>
-      <Header />
       <main>
-        <ScrollReveal>
-          <Hero />
-        </ScrollReveal>
+        <Hero />
         <ScrollReveal>
           <Features />
         </ScrollReveal>
@@ -39,7 +35,6 @@ export default function Home() {
         <ScrollReveal>
           <Newsletter />
         </ScrollReveal>
-        <Footer />
       </main>
     </>
   );
