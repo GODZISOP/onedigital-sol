@@ -121,3 +121,18 @@
 .dotActive {
   background-color: #000;
 }
+
+@media (max-width: 768px) {
+  .section {
+    padding: 4rem 1rem;
+  }
+  .watermark {
+    font-size: 16vw;
+  }
+  .title {
+    font-size: 1.5rem;
+  }
+  .testimonialSlide {
+    padding: 0 0.5rem;
+  }
+}

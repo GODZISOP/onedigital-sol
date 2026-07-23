@@ -8,20 +8,37 @@ import Cheer from '@/components/Cheer';
 import Testimonial from '@/components/Testimonial';
 import Newsletter from '@/components/Newsletter';
 import Footer from '@/components/Footer';
+import ScrollReveal from '@/components/ScrollReveal';
 
 export default function Home() {
   return (
     <>
       <Header />
       <main>
-        <Hero />
-        <Features />
-        <FeaturedItems />
-        <Banner />
-        <PopularItems />
-        <Cheer />
-        <Testimonial />
-        <Newsletter />
+        <ScrollReveal>
+          <Hero />
+        </ScrollReveal>
+        <ScrollReveal>
+          <Features />
+        </ScrollReveal>
+        <ScrollReveal>
+          <FeaturedItems />
+        </ScrollReveal>
+        <ScrollReveal>
+          <Banner />
+        </ScrollReveal>
+        <ScrollReveal>
+          <PopularItems />
+        </ScrollReveal>
+        <ScrollReveal>
+          <Cheer />
+        </ScrollReveal>
+        <ScrollReveal>
+          <Testimonial />
+        </ScrollReveal>
+        <ScrollReveal>
+          <Newsletter />
+        </ScrollReveal>
         <Footer />
       </main>
     </>
