@@ -2,17 +2,10 @@
 
 import { useState, useMemo } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import styles from './Products.module.css';
 
-// Dummy product data
-const dummyProducts = [
-  { id: 1, name: 'GILDAN COTTON T-SHIRT', category: 'T-Shirt', sizes: ['S', 'M', 'L', 'XL'], price: 29.00, image: '/featureimage1.png' },
-  { id: 2, name: 'HOODED SWEATSHIRT', category: 'Hoodie', sizes: ['M', 'L', 'XL', 'XXL'], price: 39.00, image: '/feature image2.png' },
-  { id: 3, name: 'PREMIUM CREWNECK', category: 'T-Shirt', sizes: ['S', 'M', 'L'], price: 25.00, image: '/popularimage1.png' },
-  { id: 4, name: 'SPORT PERFORMANCE TEE', category: 'T-Shirt', sizes: ['M', 'L', 'XL', 'XXXL'], price: 35.00, image: '/ppularimage2.png' },
-  { id: 5, name: 'CLASSIC ZIP HOODIE', category: 'Hoodie', sizes: ['S', 'L', 'XXL'], price: 45.00, image: '/popularimage3.png' },
-  { id: 6, name: 'V-NECK CASUAL', category: 'T-Shirt', sizes: ['S', 'M', 'L'], price: 22.00, image: '/featureimage1.png' },
-];
+import { dummyProducts } from '@/data/products';
 
 export default function ProductsPage() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -35,9 +28,19 @@ export default function ProductsPage() {
     );
   };
 
+  const categories = useMemo(() => Array.from(new Set(dummyProducts.map(p => p.category))), []);
+  const allSizes = useMemo(() => {
+    const sizes = new Set<string>();
+    dummyProducts.forEach(p => p.sizes.forEach(s => sizes.add(s)));
+    return Array.from(sizes).sort((a, b) => {
+      const order = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+      return order.indexOf(a) - order.indexOf(b);
+    });
+  }, []);
+
   // Filter and sort logic
   const filteredProducts = useMemo(() => {
-    let result = dummyProducts;
+    let result = [...dummyProducts];
 
     // Search filter
     if (searchQuery.trim() !== '') {
@@ -95,7 +98,7 @@ export default function ProductsPage() {
 
           <div className={styles.filterSection}>
             <h3 className={styles.filterTitle}>PRODUCTS</h3>
-            {['Hoodie', 'T-Shirt'].map(cat => (
+            {categories.map(cat => (
               <label key={cat} className={styles.checkboxLabel}>
                 <input 
                   type="checkbox" 
@@ -110,7 +113,7 @@ export default function ProductsPage() {
 
           <div className={styles.filterSection}>
             <h3 className={styles.filterTitle}>SIZES</h3>
-            {['L', 'M', 'S', 'XL', 'XXL', 'XXXL'].map(size => (
+            {allSizes.map(size => (
               <label key={size} className={styles.checkboxLabel}>
                 <input 
                   type="checkbox"
@@ -168,7 +171,7 @@ export default function ProductsPage() {
           <div className={styles.productGrid}>
             {filteredProducts.length > 0 ? (
               filteredProducts.map(product => (
-                <div key={product.id} className={styles.productCard}>
+                <Link href={`/product/${product.id}`} key={product.id} className={styles.productCard} style={{ textDecoration: 'none', color: 'inherit' }}>
                   <div className={styles.imageWrapper}>
                     <Image 
                       src={product.image} 
@@ -178,10 +181,11 @@ export default function ProductsPage() {
                     />
                   </div>
                   <div className={styles.productInfo}>
+                    <div className={styles.productCategory} style={{fontSize: '0.8rem', color: '#666', textTransform: 'uppercase'}}>{product.category}</div>
                     <h4 className={styles.productName}>{product.name}</h4>
                     <p className={styles.productPrice}>${product.price.toFixed(2)}</p>
                   </div>
-                </div>
+                </Link>
               ))
             ) : (
               <div className={styles.noResults}>

@@ -1,0 +1,293 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #333;
+}
+
+.breadcrumb {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1rem;
+}
+
+.breadcrumbItem {
+  color: #ccc;
+  font-size: 0.9rem;
+  margin: 0 1rem;
+  position: relative;
+  text-transform: capitalize;
+}
+
+.breadcrumbItem.active {
+  color: #000;
+  font-weight: 700;
+}
+
+.breadcrumbItem.clickable {
+  cursor: pointer;
+  color: #666;
+}
+
+.breadcrumbItem.clickable:hover {
+  color: #000;
+  text-decoration: underline;
+}
+
+.breadcrumbItem:not(:last-child)::after {
+  content: '>';
+  position: absolute;
+  right: -1.2rem;
+  color: #eee;
+}
+
+.pageTitle {
+  color: #222;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1rem;
+}
+
+.mainContent {
+  display: flex;
+  gap: 2rem;
+}
+
+.leftColumn {
+  flex: 1;
+}
+
+.rightColumn {
+  width: 300px;
+}
+
+.sectionTitle {
+  color: #444;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  margin-top: 1.5rem;
+}
+
+.quantityTable {
+  margin-bottom: 2rem;
+}
+
+.quantityText {
+  font-size: 0.9rem;
+  color: #444;
+  margin-bottom: 0.5rem;
+}
+
+.sizeInputs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.sizeBox {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  padding: 0.25rem;
+  background: #f9f9f9;
+}
+
+.sizeBox label {
+  width: 2.5rem;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: #555;
+  border-right: 1px solid #ddd;
+  margin-right: 0.25rem;
+}
+
+.sizeBox input {
+  width: 3rem;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.updateLink {
+  color: #000;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.finePrint {
+  font-size: 0.75rem;
+  color: #888;
+  margin-top: 0.25rem;
+}
+
+.flexRow {
+  display: flex;
+  gap: 2rem;
+}
+
+.flexHalf {
+  flex: 1;
+}
+
+.mockupImage {
+  width: 100%;
+  border: 1px solid #eee;
+  background: #fcfcfc;
+}
+
+.mockupLabel {
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.radioLabel {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.radioLabel input {
+  margin-right: 0.5rem;
+}
+
+.deliveryDate {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  text-align: right;
+}
+
+.totalPrice {
+  text-align: center;
+  font-size: 1.5rem;
+  color: #666;
+  margin: 2rem 0;
+}
+
+.primaryButton {
+  background-color: #000;
+  color: white;
+  border: none;
+  padding: 1rem 2.5rem;
+  font-size: 1rem;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 700;
+  display: block;
+  width: max-content;
+  margin-left: auto;
+  text-transform: uppercase;
+  transition: opacity 0.2s;
+}
+
+.primaryButton:hover {
+  background-color: #222;
+  opacity: 0.8;
+}
+
+/* Sidebar Order Overview */
+.sidebarTitle {
+  color: #222;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.sidebarMockups {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.sidebarMockups img {
+  width: 50%;
+  border: 1px solid #eee;
+}
+
+.sidebarStats {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.sidebarRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+/* Form Styles */
+.formGroup {
+  margin-bottom: 1rem;
+}
+
+.formLabel {
+  display: block;
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.formInput {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  font-size: 0.9rem;
+}
+
+.formRow {
+  display: flex;
+  gap: 1rem;
+}
+
+.formCol {
+  flex: 1;
+}
+
+/* Payment Form */
+.cardInputWrapper {
+  display: flex;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.5rem;
+  align-items: center;
+}
+
+.cardInputWrapper input {
+  border: none;
+  flex: 1;
+  outline: none;
+  font-size: 1rem;
+}
+
+.cardIcons {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.cardIcon {
+  width: 32px;
+  height: 20px;
+  background: #eee;
+  border-radius: 2px;
+}
+
+.termsWarning {
+  color: red;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}

@@ -9,11 +9,19 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@iconify-json/game-icons": "^1.2.4",
+    "@tabler/icons": "^3.45.0",
     "@types/aos": "^3.0.8",
+    "@types/fabric": "^5.3.11",
     "aos": "^2.3.4",
+    "axios": "^1.18.1",
+    "cheerio": "^1.1.0",
+    "fabric": "^7.4.0",
     "framer-motion": "^12.42.2",
+    "html2canvas": "^1.4.1",
     "lucide-react": "^1.26.0",
     "next": "16.2.11",
+    "nodemailer": "^9.0.3",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },

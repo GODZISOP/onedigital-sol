@@ -23,12 +23,8 @@ export default function Hero() {
         </p>
 
         <div className={styles.ctaGroup}>
-          <Link href="/get-started" className={styles.primaryButton}>
+          <Link href="/design" className={styles.primaryButton}>
             Get Started
-          </Link>
-          <span className={styles.orText}>or</span>
-          <Link href="/quote" className={styles.secondaryLink}>
-            Get a Quick Quote
           </Link>
         </div>
       </div>

@@ -21,6 +21,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Newsletter from '@/components/Newsletter';
 import AOSInit from '@/components/AOSInit';
+import { CartProvider } from '@/context/CartContext';
 
 export default function RootLayout({
   children,
@@ -29,12 +30,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Anton&family=Audiowide&family=Bebas+Neue&family=Black+Ops+One&family=Bungee&family=Caveat&family=Cinzel&family=Creepster&family=Dancing+Script&family=Fascinate&family=Graduate&family=Great+Vibes&family=Lato&family=Lobster&family=Lora&family=Merriweather&family=Montserrat&family=Open+Sans&family=Orbitron&family=Oswald&family=Pacifico&family=Playfair+Display&family=Press+Start+2P&family=Rajdhani&family=Righteous&family=Roboto&family=Russo+One&family=Satisfy&family=Syncopate&display=swap" rel="stylesheet" />
+      </head>
       <body>
-        <AOSInit />
-        <Header />
-        {children}
-        <Newsletter />
-        <Footer />
+        <CartProvider>
+          <AOSInit />
+          <Header />
+          {children}
+          <Newsletter />
+          <Footer />
+        </CartProvider>
       </body>
     </html>
   );

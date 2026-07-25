@@ -4,10 +4,12 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Search, ShoppingCart, User, ChevronDown, Menu, X } from 'lucide-react';
+import { useCart } from '@/context/CartContext';
 import styles from './Header.module.css';
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { cartCount } = useCart();
 
   return (
     <header className={styles.header}>
@@ -51,10 +53,10 @@ export default function Header() {
         </form>
 
         <div className={styles.iconGroup}>
-          <div className={styles.cartWrapper}>
+          <Link href="/checkout" className={styles.cartWrapper}>
             <ShoppingCart size={24} color="black" />
-            <span className={styles.cartBadge}>0</span>
-          </div>
+            <span className={styles.cartBadge}>{cartCount}</span>
+          </Link>
           <Link href="/account">
             <User size={24} color="black" />
           </Link>

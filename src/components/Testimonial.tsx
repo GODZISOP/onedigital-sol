@@ -71,7 +71,8 @@ export default function Testimonial() {
   const current = testimonials[currentIndex];
 
   return (
-    <section className={styles.section}>
+    <>
+    <section className={styles.section} id="testimonial-section">
       <div className={styles.watermark}>TESTIMONIALS</div>
       
       <div className={styles.container}>
@@ -123,5 +124,21 @@ export default function Testimonial() {
         </div>
       </div>
     </section>
+
+    <div className={styles.galleryStrip}>
+      <div className={styles.galleryImage}>
+        <Image src="/gallery1_new.jpg" alt="Gallery 1" fill style={{ objectFit: 'cover' }} />
+      </div>
+      <div className={styles.galleryImage}>
+        <Image src="/gallery2_new.jpg" alt="Gallery 2" fill style={{ objectFit: 'cover' }} />
+      </div>
+      <div className={styles.galleryImage}>
+        <Image src="/gallery3_new.jpg" alt="Gallery 3" fill style={{ objectFit: 'cover' }} />
+      </div>
+      <div className={styles.galleryImage}>
+        <Image src="/gallery4_new.jpg" alt="Gallery 4" fill style={{ objectFit: 'cover' }} />
+      </div>
+    </div>
+    </>
   );
 }

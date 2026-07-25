@@ -1,13 +1,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { dummyProducts } from '@/data/products';
 import styles from './PopularItems.module.css';
 
 export default function PopularItems() {
-  const items = [
-    { id: 1, title: 'NO EXCUSE', price: '29.00$', image: '/popularimage1.png' },
-    { id: 2, title: 'STRIPE TANK TOP', price: '29.00$', image: '/popularimage2.png' },
-    { id: 3, title: 'NORMAL IS BORING', price: '29.00$', image: '/popularimage3.png' },
-  ];
+  const items = dummyProducts.slice(2, 5);
 
   return (
     <section className={styles.section}>
@@ -18,21 +15,21 @@ export default function PopularItems() {
 
       <div className={styles.grid}>
         {items.map((item) => (
-          <div key={item.id} className={styles.item}>
+          <Link href={`/product/${item.id}`} key={item.id} className={styles.item} style={{ textDecoration: 'none', color: 'inherit' }}>
             <div className={styles.imageWrapper}>
               <Image 
                 src={item.image} 
-                alt={item.title} 
+                alt={item.name} 
                 fill 
                 className={styles.itemImage}
                 sizes="(max-width: 768px) 100vw, 33vw"
               />
             </div>
-            <h3 className={styles.itemTitle}>{item.title}</h3>
+            <h3 className={styles.itemTitle}>{item.name}</h3>
             <p className={styles.itemPrice}>
-              {item.price} <span className={styles.vat}>inc. VAT</span>
+              ${item.price.toFixed(2)} <span className={styles.vat}>inc. VAT</span>
             </p>
-          </div>
+          </Link>
         ))}
       </div>
 

@@ -1,11 +1,10 @@
 import Image from 'next/image';
+import Link from 'next/link';
+import { dummyProducts } from '@/data/products';
 import styles from './FeaturedItems.module.css';
 
 export default function FeaturedItems() {
-  const items = [
-    { id: 1, title: 'HOODED SWEATSHIRT', price: '$29.00', image: '/featureimage1.png' },
-    { id: 2, title: 'GILDAN COTTON T-SHIRT', price: '$29.00', image: '/featureimage2.png' },
-  ];
+  const items = dummyProducts.slice(0, 2);
 
   return (
     <section className={styles.section}>
@@ -16,19 +15,19 @@ export default function FeaturedItems() {
 
       <div className={styles.grid}>
         {items.map((item) => (
-          <div key={item.id} className={styles.item}>
+          <Link href={`/product/${item.id}`} key={item.id} className={styles.item} style={{ textDecoration: 'none', color: 'inherit' }}>
             <div className={styles.imageWrapper}>
               <Image 
                 src={item.image} 
-                alt={item.title} 
+                alt={item.name} 
                 fill 
                 className={styles.itemImage}
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
             </div>
-            <h3 className={styles.itemTitle}>{item.title}</h3>
-            <p className={styles.itemPrice}>{item.price}</p>
-          </div>
+            <h3 className={styles.itemTitle}>{item.name}</h3>
+            <p className={styles.itemPrice}>${item.price.toFixed(2)}</p>
+          </Link>
         ))}
       </div>
     </section>
