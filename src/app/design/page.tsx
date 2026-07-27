@@ -667,7 +667,6 @@ export default function DesignPage() {
             <small>per shirt ({totalQuantity})</small>
           </div>
           <button className={styles.saveBtn} onClick={handleResetDesign} style={{ color: '#dc3545', borderColor: '#dc3545' }}>Reset</button>
-          <button className={styles.saveBtn} onClick={handleSaveDesign}>Save Design</button>
           <button className={styles.quoteBtn} onClick={() => setIsQuoteModalOpen(true)}>Quote & Buy</button>
         </div>
       </div>

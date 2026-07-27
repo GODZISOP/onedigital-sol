@@ -94,15 +94,15 @@ function ProductsContent() {
       <main className={styles.container}>
         {/* SIDEBAR */}
         <aside className={styles.sidebar}>
-          <div className={styles.searchContainer} style={{ display: 'flex', width: '100%' }}>
+          <div className={styles.searchContainer}>
             <input 
               type="text" 
-              placeholder="Search products..." 
+              placeholder="Product..." 
               className={styles.searchInput}
-              style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: '1px solid #ddd' }}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
+            <button className={styles.searchButton}>Search</button>
           </div>
 
           <div className={styles.filterSection}>
