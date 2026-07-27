@@ -14,11 +14,18 @@ export default function Header() {
   const { cartCount } = useCart();
   const router = useRouter();
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setSearchQuery(val);
+    if (val.trim() !== '') {
+      router.push(`/products?search=${encodeURIComponent(val.trim())}`);
+    } else {
+      router.push(`/products`);
+    }
+  };
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
-    }
   };
 
   return (
@@ -61,7 +68,7 @@ export default function Header() {
             placeholder="Search..." 
             className={styles.searchInput}
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={handleSearchChange}
           />
           <button type="submit" className={styles.searchButton}>
             <Search size={18} />

@@ -1,19 +1,23 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import styles from './Products.module.css';
 
 import { dummyProducts } from '@/data/products';
 
-export default function ProductsPage() {
-  const [searchQuery, setSearchQuery] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return new URLSearchParams(window.location.search).get('search') || '';
-    }
-    return '';
-  });
+function ProductsContent() {
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams.get('search') || '';
+  
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
+  
+  useEffect(() => {
+    setSearchQuery(searchParams.get('search') || '');
+  }, [searchParams]);
+
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState<string>('');
@@ -201,5 +205,13 @@ export default function ProductsPage() {
         </section>
       </main>
     </>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading products...</div>}>
+      <ProductsContent />
+    </Suspense>
   );
 }
