@@ -20,9 +20,6 @@ export default function Home() {
           <FeaturedItems />
         </ScrollReveal>
         <ScrollReveal>
-          {/* <Banner /> */}
-        </ScrollReveal>
-        <ScrollReveal>
           <PopularItems />
         </ScrollReveal>
         <ScrollReveal>

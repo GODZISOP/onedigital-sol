@@ -416,7 +416,8 @@ export default function DesignPage() {
     if (!canvas) return;
     try {
       const { objects, options } = await fabric.loadSVGFromString(svgString);
-      const obj = fabric.util.groupSVGElements(objects, options);
+      const validObjects = objects.filter(obj => obj !== null) as any[];
+      const obj = fabric.util.groupSVGElements(validObjects, options);
       obj.set({ left: 100, top: 100 });
       obj.scaleToWidth(100);
       

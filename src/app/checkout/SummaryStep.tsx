@@ -83,8 +83,8 @@ export default function SummaryStep({ data, onNext }: SummaryStepProps) {
     const combinedQuantities: any = {};
 
     if (hasCartItems) {
-      outputData.items = data.items;
-      data.items.forEach((item: any) => {
+      outputData.items = data.items || [];
+      (data.items || []).forEach((item: any) => {
         if (item.checkoutData?.quantities) {
            Object.entries(item.checkoutData.quantities).forEach(([size, qty]) => {
              combinedQuantities[size] = (combinedQuantities[size] || 0) + (qty as number);
