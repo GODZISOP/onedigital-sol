@@ -8,7 +8,12 @@ import styles from './Products.module.css';
 import { dummyProducts } from '@/data/products';
 
 export default function ProductsPage() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return new URLSearchParams(window.location.search).get('search') || '';
+    }
+    return '';
+  });
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState<string>('');
@@ -85,15 +90,15 @@ export default function ProductsPage() {
       <main className={styles.container}>
         {/* SIDEBAR */}
         <aside className={styles.sidebar}>
-          <div className={styles.searchContainer}>
+          <div className={styles.searchContainer} style={{ display: 'flex', width: '100%' }}>
             <input 
               type="text" 
-              placeholder="Product..." 
+              placeholder="Search products..." 
               className={styles.searchInput}
+              style={{ width: '100%', padding: '0.75rem', borderRadius: '4px', border: '1px solid #ddd' }}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <button className={styles.searchButton}>Search</button>
           </div>
 
           <div className={styles.filterSection}>

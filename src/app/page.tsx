@@ -20,7 +20,7 @@ export default function Home() {
           <FeaturedItems />
         </ScrollReveal>
         <ScrollReveal>
-          <Banner />
+          {/* <Banner /> */}
         </ScrollReveal>
         <ScrollReveal>
           <PopularItems />

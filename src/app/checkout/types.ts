@@ -1,4 +1,5 @@
 export interface CheckoutData {
+  items?: any[];
   quantities: {
     S: number;
     M: number;

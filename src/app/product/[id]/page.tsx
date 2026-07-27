@@ -14,11 +14,14 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string>(product?.sizes[0] || 'M');
+  const [addName, setAddName] = useState(false);
   const { addToCart } = useCart();
 
   if (!product) {
     return notFound();
   }
+
+  const finalPrice = product.id === 3 && addName ? product.price + 4 : product.price;
 
   const handleAddToCart = () => {
     const sizesSelected = { [selectedSize]: quantity };
@@ -26,20 +29,20 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     addToCart({
       type: 'product',
       productId: product.id,
-      name: `${product.name} (Size: ${selectedSize})`,
-      price: product.price,
+      name: `${product.name} (Size: ${selectedSize})${addName ? ' + Name on Back' : ''}`,
+      price: finalPrice,
       totalQuantity: quantity,
       image: product.image,
       checkoutData: {
         shirtColor: 'White', // Default
         quantities: sizesSelected,
-        totalPrice: (product.price * quantity).toFixed(2),
+        totalPrice: (finalPrice * quantity).toFixed(2),
         frontImage: product.image,
         designColors: [],
         frontColors: [],
         backColors: [],
         pricingBreakdown: {
-          basePrice: product.price * quantity,
+          basePrice: finalPrice * quantity,
           textPrice: 0,
           patchPrice: 0,
           colorPrice: 0
@@ -57,13 +60,18 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       </div>
       
       <div className={styles.productWrapper}>
-        <div className={styles.imageSection}>
+        <div className={styles.imageSection} style={{ overflow: 'hidden' }}>
           <Image 
             src={product.image} 
             alt={product.name} 
             width={500} 
             height={500} 
-            style={{ objectFit: 'contain' }}
+            style={{ 
+              objectFit: 'contain', 
+              mixBlendMode: 'multiply',
+              transform: 'scale(1.3)',
+              transformOrigin: 'center center'
+            }}
             priority
           />
         </div>

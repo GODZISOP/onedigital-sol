@@ -9,9 +9,29 @@ interface SidebarProps {
 export default function Sidebar({ data }: SidebarProps) {
   if (!data) return null;
 
-  const totalQuantity = Object.values(data.quantities).reduce((a, b) => a + b, 0);
-  const finalPrice = parseFloat(String(data.finalPrice || data.totalPrice)) || 0;
+  let totalQuantity = 0;
+  let finalPrice = 0;
+  let baseShirtsPrice = 0;
 
+  if (data.items && data.items.length > 0) {
+    data.items.forEach((item: any) => {
+      totalQuantity += item.totalQuantity || 0;
+      finalPrice += (item.price * item.totalQuantity) || 0;
+      baseShirtsPrice += (item.price * item.totalQuantity) || 0;
+    });
+  }
+
+  if (data.quantities) {
+    totalQuantity += Object.values(data.quantities || {}).reduce((a: any, b: any) => a + (parseInt(b as string) || 0), 0) as number;
+  }
+
+  if (data.pricingBreakdown) {
+    baseShirtsPrice += data.pricingBreakdown.basePrice || 0;
+  }
+
+  if (data.finalPrice || data.totalPrice) {
+    finalPrice += parseFloat(String(data.finalPrice || data.totalPrice)) || 0;
+  }
   return (
     <aside className={styles.rightColumn}>
       <h3 className={styles.sidebarTitle}>Order Overview</h3>
@@ -68,7 +88,7 @@ export default function Sidebar({ data }: SidebarProps) {
         </div>
         <div className={styles.sidebarRow} style={{ borderTop: '1px solid #eaeaea', marginTop: '1rem', paddingTop: '1rem' }}>
           <span>Base Shirts</span>
-          <span>${data.pricingBreakdown?.basePrice?.toFixed(2) || '0.00'}</span>
+          <span>${baseShirtsPrice.toFixed(2)}</span>
         </div>
         <div className={styles.sidebarRow}>
           <span>Text Elements</span>

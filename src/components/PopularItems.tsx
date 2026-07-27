@@ -4,7 +4,7 @@ import { dummyProducts } from '@/data/products';
 import styles from './PopularItems.module.css';
 
 export default function PopularItems() {
-  const items = dummyProducts.slice(2, 5);
+  const items = dummyProducts.slice(3, 6);
 
   return (
     <section className={styles.section}>

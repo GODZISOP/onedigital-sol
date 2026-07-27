@@ -4,7 +4,7 @@ import { dummyProducts } from '@/data/products';
 import styles from './FeaturedItems.module.css';
 
 export default function FeaturedItems() {
-  const items = dummyProducts.slice(0, 2);
+  const items = dummyProducts.slice(0, 3);
 
   return (
     <section className={styles.section}>
@@ -26,7 +26,9 @@ export default function FeaturedItems() {
               />
             </div>
             <h3 className={styles.itemTitle}>{item.name}</h3>
-            <p className={styles.itemPrice}>${item.price.toFixed(2)}</p>
+            <p className={styles.itemPrice}>
+              ${item.price.toFixed(2)} <span style={{ fontSize: '0.65em', color: '#999', fontWeight: 'normal' }}>inc. VAT</span>
+            </p>
           </Link>
         ))}
       </div>

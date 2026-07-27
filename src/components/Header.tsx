@@ -3,20 +3,30 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Search, ShoppingCart, User, ChevronDown, Menu, X } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import styles from './Header.module.css';
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const { cartCount } = useCart();
+  const router = useRouter();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
 
   return (
     <header className={styles.header}>
       <div className={styles.leftSection}>
         <div className={styles.logo}>
           <Link href="/">
-            <Image src="/logo.png" alt="East Coast Designs" width={100} height={35} priority style={{ objectFit: 'contain' }} />
+            <Image src="/logo_red.png" alt="East Coast Designs" width={180} height={60} priority style={{ objectFit: 'contain' }} />
           </Link>
         </div>
 
@@ -45,9 +55,15 @@ export default function Header() {
       </div>
 
       <div className={styles.actions}>
-        <form className={styles.searchForm}>
-          <input type="text" placeholder="Search..." className={styles.searchInput} />
-          <button type="button" className={styles.searchButton}>
+        <form className={styles.searchForm} onSubmit={handleSearch}>
+          <input 
+            type="text" 
+            placeholder="Search..." 
+            className={styles.searchInput}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <button type="submit" className={styles.searchButton}>
             <Search size={18} />
           </button>
         </form>
