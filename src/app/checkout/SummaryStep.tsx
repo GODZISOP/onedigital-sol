@@ -45,11 +45,12 @@ export default function SummaryStep({ data, onNext }: SummaryStepProps) {
   let colorCount = 0;
 
   if (hasCartItems) {
-    totalQuantity += data.items.reduce((sum: number, item: any) => sum + item.totalQuantity, 0);
-    basePrice += data.items.reduce((sum: number, item: any) => sum + (item.price * item.totalQuantity), 0);
-    textCount += data.items.reduce((sum: number, item: any) => sum + ((item.checkoutData?.pricingBreakdown?.textPrice || 0) / 2.0), 0);
-    patchCount += data.items.reduce((sum: number, item: any) => sum + ((item.checkoutData?.pricingBreakdown?.patchPrice || 0) / 3.0), 0);
-    colorCount += data.items.reduce((sum: number, item: any) => sum + ((item.checkoutData?.pricingBreakdown?.colorPrice || 0) / 1.5), 0);
+    const items = data.items || [];
+    totalQuantity += items.reduce((sum: number, item: any) => sum + item.totalQuantity, 0);
+    basePrice += items.reduce((sum: number, item: any) => sum + (item.price * item.totalQuantity), 0);
+    textCount += items.reduce((sum: number, item: any) => sum + ((item.checkoutData?.pricingBreakdown?.textPrice || 0) / 2.0), 0);
+    patchCount += items.reduce((sum: number, item: any) => sum + ((item.checkoutData?.pricingBreakdown?.patchPrice || 0) / 3.0), 0);
+    colorCount += items.reduce((sum: number, item: any) => sum + ((item.checkoutData?.pricingBreakdown?.colorPrice || 0) / 1.5), 0);
   }
   
   if (hasCustomDesign) {
@@ -153,7 +154,7 @@ export default function SummaryStep({ data, onNext }: SummaryStepProps) {
           
           {hasCartItems && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
-              {data.items.map((item: any) => {
+              {(data.items || []).map((item: any) => {
                 const sizeEntries = item.checkoutData?.quantities 
                   ? Object.entries(item.checkoutData.quantities).filter(([_, qty]) => (qty as number) > 0) 
                   : [];
