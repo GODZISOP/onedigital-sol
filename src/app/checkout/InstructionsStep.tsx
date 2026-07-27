@@ -44,7 +44,7 @@ export default function InstructionsStep({ data, onNext }: InstructionsStepProps
             </div>
             
             <div className={styles.mockupLabel}>Front Print Colors ({frontColors.length})</div>
-            {frontColors.length > 0 ? frontColors.map((color, idx) => (
+            {frontColors.length > 0 ? frontColors.map((color: string, idx: number) => (
               <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                 <div style={{ width: '20px', height: '20px', backgroundColor: color, border: '1px solid #ddd' }}></div>
                 <span>{color}</span>
@@ -61,7 +61,7 @@ export default function InstructionsStep({ data, onNext }: InstructionsStepProps
             </div>
 
             <div className={styles.mockupLabel}>Back Print Colors ({backColors.length})</div>
-            {backColors.length > 0 ? backColors.map((color, idx) => (
+            {backColors.length > 0 ? backColors.map((color: string, idx: number) => (
               <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                 <div style={{ width: '20px', height: '20px', backgroundColor: color, border: '1px solid #ddd' }}></div>
                 <span>{color}</span>
