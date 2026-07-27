@@ -10,6 +10,8 @@ export default function Hero() {
         loop
         muted
         playsInline
+        webkit-playsinline="true"
+        preload="auto"
       >
         <source src="/hero_video.mp4" type="video/mp4" />
       </video>

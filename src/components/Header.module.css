@@ -235,7 +235,11 @@
 
 @media (max-width: 768px) {
   .header {
-    padding: 1rem;
+    padding: 0.5rem 1rem;
+  }
+  .logo img {
+    width: 130px !important;
+    height: 45px !important;
   }
   .searchForm {
     display: none;

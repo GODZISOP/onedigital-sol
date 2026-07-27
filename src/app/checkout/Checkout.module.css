@@ -291,3 +291,35 @@
   font-size: 0.9rem;
   margin-bottom: 0.5rem;
 }
+
+@media (max-width: 768px) {
+  .mainContent {
+    flex-direction: column;
+  }
+  .rightColumn {
+    width: 100%;
+  }
+  .flexRow {
+    flex-direction: column;
+  }
+  .sizeInputs {
+    flex-wrap: wrap;
+  }
+  .formRow {
+    flex-direction: column;
+  }
+  .primaryButton {
+    width: 100%;
+    margin-left: 0;
+  }
+  .breadcrumb {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .breadcrumbItem {
+    margin: 0 0.25rem;
+  }
+  .container {
+    padding: 1rem;
+  }
+}

@@ -112,5 +112,22 @@
 @media (max-width: 768px) {
   .productWrapper {
     flex-direction: column;
+    gap: 2rem;
+  }
+  .container {
+    padding: 1rem;
+  }
+  .imageSection {
+    padding: 1rem;
+  }
+  .title {
+    font-size: 2rem;
+  }
+  .actionRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .addToCartBtn {
+    width: 100%;
   }
 }

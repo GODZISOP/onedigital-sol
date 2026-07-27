@@ -114,13 +114,27 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
           </div>
           
           <div className={styles.actionRow}>
-            <input 
-              type="number" 
-              min="1" 
-              value={quantity} 
-              onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-              className={styles.quantityInput}
-            />
+            <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ccc', borderRadius: '4px', overflow: 'hidden', height: '40px' }}>
+              <button 
+                onClick={() => setQuantity(q => Math.max(1, q - 1))} 
+                style={{ width: '40px', height: '100%', background: '#f5f5f5', border: 'none', cursor: 'pointer', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                -
+              </button>
+              <input 
+                type="number" 
+                min="1" 
+                value={quantity} 
+                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                style={{ width: '50px', height: '100%', border: 'none', textAlign: 'center', borderLeft: '1px solid #ccc', borderRight: '1px solid #ccc', outline: 'none', fontSize: '1rem', appearance: 'textfield' }}
+              />
+              <button 
+                onClick={() => setQuantity(q => q + 1)} 
+                style={{ width: '40px', height: '100%', background: '#f5f5f5', border: 'none', cursor: 'pointer', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                +
+              </button>
+            </div>
             <button className={styles.addToCartBtn} onClick={handleAddToCart}>
               ADD TO CART
             </button>
