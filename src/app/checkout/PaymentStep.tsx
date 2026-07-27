@@ -6,9 +6,10 @@ import Sidebar from './Sidebar';
 interface PaymentStepProps {
   data: CheckoutData | null;
   onNext: (data?: Partial<CheckoutData>) => void;
+  onBack?: () => void;
 }
 
-export default function PaymentStep({ data, onNext }: PaymentStepProps) {
+export default function PaymentStep({ data, onNext, onBack }: PaymentStepProps) {
   const [formData, setFormData] = useState(data?.paymentDetails || {
     cardNumber: '',
     expiry: '',
