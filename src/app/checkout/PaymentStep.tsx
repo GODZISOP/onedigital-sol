@@ -5,7 +5,7 @@ import Sidebar from './Sidebar';
 
 interface PaymentStepProps {
   data: CheckoutData | null;
-  onNext: () => void;
+  onNext: (data?: Partial<CheckoutData>) => void;
 }
 
 export default function PaymentStep({ data, onNext }: PaymentStepProps) {
