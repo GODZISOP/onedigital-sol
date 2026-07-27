@@ -114,7 +114,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
           </div>
           
           <div className={styles.actionRow}>
-            <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ccc', borderRadius: '4px', overflow: 'hidden', height: '40px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ccc', borderRadius: '4px', overflow: 'hidden', height: '40px', width: 'fit-content' }}>
               <button 
                 onClick={() => setQuantity(q => Math.max(1, q - 1))} 
                 style={{ width: '40px', height: '100%', background: '#f5f5f5', border: 'none', cursor: 'pointer', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
