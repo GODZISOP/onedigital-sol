@@ -15,25 +15,36 @@
 .searchContainer {
   display: flex;
   margin-bottom: 2rem;
+  height: 42px;
+  border: 1px solid #ccc;
+  overflow: hidden;
+  border-radius: 2px;
 }
 
 .searchInput {
   flex: 1;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-right: none;
+  height: 100%;
+  padding: 0 1rem;
+  border: none;
   font-size: 0.9rem;
   outline: none;
+  margin: 0;
+  background: white;
 }
 
 .searchButton {
+  height: 100%;
   background-color: black;
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
+  padding: 0 1.5rem;
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .filterSection {

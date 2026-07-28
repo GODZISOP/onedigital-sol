@@ -5,7 +5,6 @@ import FeaturedItems from '@/components/FeaturedItems';
 import Banner from '@/components/Banner';
 import PopularItems from '@/components/PopularItems';
 import Cheer from '@/components/Cheer';
-import Testimonial from '@/components/Testimonial';
 import ScrollReveal from '@/components/ScrollReveal';
 
 export default function Home() {
@@ -25,9 +24,7 @@ export default function Home() {
         <ScrollReveal>
           <Cheer />
         </ScrollReveal>
-        <ScrollReveal>
-          <Testimonial />
-        </ScrollReveal>
+
       </main>
     </>
   );

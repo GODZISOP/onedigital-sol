@@ -44,9 +44,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         backColors: [],
         pricingBreakdown: {
           basePrice: finalPrice * quantity,
-          textPrice: 0,
-          patchPrice: 0,
-          colorPrice: 0
+          decorationPrice: 0
         }
       }
     });

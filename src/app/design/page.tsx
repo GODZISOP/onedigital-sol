@@ -92,9 +92,11 @@ export default function DesignPage() {
   
   // Quote & Buy State
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
+  const [quoteImage, setQuoteImage] = useState<string | null>(null);
   const [quantities, setQuantities] = useState({ S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0 });
   const totalQuantity = Object.values(quantities).reduce((a, b) => a + (parseInt(b as any) || 0), 0);
   
+  const [renderTrigger, setRenderTrigger] = useState(0);
   
   // Preview State
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
@@ -119,35 +121,97 @@ export default function DesignPage() {
   const [clipartColor, setClipartColor] = useState('#000000');
   const [clipartCategoryFilter, setClipartCategoryFilter] = useState('All');
 
-  const [currentView, setCurrentView] = useState<ViewType>('front');
-  const [canvasStates, setCanvasStates] = useState<Record<ViewType, any>>({
-    front: null,
-    back: null,
-    right: null,
-    left: null
+  const [currentView, setCurrentView] = useState<ViewType>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem('designerCurrentView');
+      if (stored) return stored as ViewType;
+    }
+    return 'front';
   });
+
+  useEffect(() => {
+    if (isLoaded) {
+      sessionStorage.setItem('designerCurrentView', currentView);
+    }
+  }, [currentView, isLoaded]);
+  const [canvasStates, setCanvasStates] = useState<Record<ViewType, any>>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem('designerCanvasStates');
+      if (stored) return JSON.parse(stored);
+    }
+    return { front: null, back: null, right: null, left: null };
+  });
+
+  // Keep sessionStorage in sync whenever canvasStates changes
+  useEffect(() => {
+    if (isLoaded) {
+      sessionStorage.setItem('designerCanvasStates', JSON.stringify(canvasStates));
+    }
+  }, [canvasStates, isLoaded]);
 
   const [activeObject, setActiveObject] = useState<any>(null);
   const [canvas, setCanvas] = useState<any>(null);
 
   // Dynamic Pricing Calculation
-  const getObjectCount = () => {
-    let count = 0;
-    if (canvas) {
-      count += canvas.getObjects().length;
+  const getPricingBreakdown = () => {
+    let breakdown = { basePrice: 6.98, frontPrice: 0, backPrice: 0, leftPrice: 0, rightPrice: 0 };
+
+    const analyzeCanvas = (canvasObjects: any[], view: ViewType) => {
+      if (!canvasObjects || canvasObjects.length === 0) return 0;
+      let hasUpload = false;
+      let hasText = false;
+      let hasClipart = false;
+
+      canvasObjects.forEach(obj => {
+        if (obj.sourceType === 'upload') hasUpload = true;
+        else if (obj.sourceType === 'clipart') hasClipart = true;
+        else if (obj.sourceType === 'text') hasText = true;
+        else if (obj.type === 'i-text' || obj.type === 'text') hasText = true;
+        else hasClipart = true; 
+      });
+
+      let total = 0;
+      if (view === 'front') {
+        if (hasUpload) total += 6.02;
+        if (hasText) total += 5.02;
+        if (hasClipart) total += 5.02;
+      } else if (view === 'back') {
+        if (hasUpload) total += 7.02;
+        if (hasText) total += 6.02;
+        if (hasClipart) total += 6.02;
+      } else {
+        // Sleeves (Left/Right)
+        if (hasUpload) total += 1.50;
+        if (hasText) total += 1.50;
+        if (hasClipart) total += 1.50;
+      }
+      
+      return total;
+    };
+
+    if (canvas && canvas.getObjects().length > 0) {
+      if (currentView === 'front') breakdown.frontPrice = analyzeCanvas(canvas.getObjects(), 'front');
+      if (currentView === 'back') breakdown.backPrice = analyzeCanvas(canvas.getObjects(), 'back');
+      if (currentView === 'left') breakdown.leftPrice = analyzeCanvas(canvas.getObjects(), 'left');
+      if (currentView === 'right') breakdown.rightPrice = analyzeCanvas(canvas.getObjects(), 'right');
     }
+
     Object.keys(canvasStates).forEach(key => {
-      if (key !== currentView && canvasStates[key as ViewType]?.objects) {
-        count += canvasStates[key as ViewType].objects.length;
+      const view = key as ViewType;
+      if (view !== currentView && canvasStates[view]?.objects?.length > 0) {
+        const cost = analyzeCanvas(canvasStates[view].objects, view);
+        if (view === 'front') breakdown.frontPrice = cost;
+        if (view === 'back') breakdown.backPrice = cost;
+        if (view === 'left') breakdown.leftPrice = cost;
+        if (view === 'right') breakdown.rightPrice = cost;
       }
     });
-    return count;
+
+    return breakdown;
   };
 
-  const objectCount = getObjectCount();
-  const colorCost = shirtColor.toUpperCase() !== '#FFFFFF' ? 1.00 : 0;
-  const objectCost = objectCount * 0.50;
-  const PRICE_PER_SHIRT = parseFloat((4.98 + colorCost + objectCost).toFixed(2));
+  const pricing = getPricingBreakdown();
+  const PRICE_PER_SHIRT = parseFloat((pricing.basePrice + pricing.frontPrice + pricing.backPrice + pricing.leftPrice + pricing.rightPrice).toFixed(2));
   const totalPrice = (totalQuantity * PRICE_PER_SHIRT).toFixed(2);
 
   const handleCanvasReady = useCallback((fabCanvas: any) => {
@@ -214,8 +278,9 @@ export default function DesignPage() {
     };
 
     const saveCanvasState = () => {
-      const json = canvas.toJSON();
+      const json = canvas.toJSON(['sourceType']);
       sessionStorage.setItem('designerCanvasData', JSON.stringify(json));
+      setRenderTrigger(prev => prev + 1); // Force re-render to update pricing
     };
 
     const handleSelection = (e: any) => {
@@ -384,7 +449,8 @@ export default function DesignPage() {
       fill: textColor,
       fontSize: 30,
       charSpacing: charSpacing * 10,
-    });
+      sourceType: 'text'
+    } as any);
     canvas.add(text);
     canvas.setActiveObject(text);
   };
@@ -400,7 +466,7 @@ export default function DesignPage() {
       try {
         const img = await fabric.FabricImage.fromURL(data);
         img.scaleToWidth(200);
-        img.set({ left: 100, top: 100 });
+        img.set({ left: 100, top: 100, sourceType: 'upload' } as any);
         canvas.add(img);
         canvas.setActiveObject(img);
         canvas.requestRenderAll();
@@ -418,7 +484,7 @@ export default function DesignPage() {
       const { objects, options } = await fabric.loadSVGFromString(svgString);
       const validObjects = objects.filter(obj => obj !== null) as any[];
       const obj = fabric.util.groupSVGElements(validObjects, options);
-      obj.set({ left: 100, top: 100 });
+      obj.set({ left: 100, top: 100, sourceType: 'clipart' } as any);
       obj.scaleToWidth(100);
       
       // Apply selected color
@@ -468,7 +534,7 @@ export default function DesignPage() {
 
   const handleViewChange = (newView: ViewType) => {
     if (newView === currentView || !canvas) return;
-    const currentJson = canvas.toJSON();
+    const currentJson = canvas.toJSON(['sourceType']);
     setCanvasStates(prev => ({ ...prev, [currentView]: currentJson }));
     
     const newJson = canvasStates[newView];
@@ -548,13 +614,154 @@ export default function DesignPage() {
     });
   };
 
+  const generateImageForView = async (view: ViewType): Promise<string> => {
+    const isCurrent = currentView === view;
+    const state = isCurrent || !canvasStates[view] ? null : JSON.parse(JSON.stringify(canvasStates[view]));
+    
+    // If it's the current view and canvas is empty, or if it's a saved state and it's empty, return ''
+    if (isCurrent) {
+      if (!canvas || canvas.getObjects().length === 0) return '';
+    } else {
+      if (!state || !state.objects || state.objects.length === 0) return '';
+    }
+    
+    return new Promise<string>((resolve, reject) => {
+      const doComposite = (designDataUrl: string) => {
+         const compositeCanvas = document.createElement('canvas');
+         compositeCanvas.width = 500;
+         compositeCanvas.height = 600;
+         const ctx = compositeCanvas.getContext('2d');
+         if (!ctx) return resolve('');
+         
+         const img = new window.Image();
+         img.crossOrigin = 'Anonymous';
+         if (view === 'front') img.src = '/image copy 8.png';
+         else if (view === 'back') img.src = '/image.png';
+         else if (view === 'left') img.src = '/image copy.png';
+         else img.src = '/image copy 2.png';
+         
+         img.onload = () => {
+           ctx.fillStyle = shirtColor;
+           ctx.fillRect(0, 0, 500, 600);
+           ctx.globalCompositeOperation = 'destination-in';
+           const scale = Math.min(500 / img.width, 600 / img.height);
+           const w = img.width * scale;
+           const h = img.height * scale;
+           const x = (500 - w) / 2;
+           const y = (600 - h) / 2;
+           ctx.drawImage(img, x, y, w, h);
+           ctx.globalCompositeOperation = 'multiply';
+           ctx.drawImage(img, x, y, w, h);
+           ctx.globalCompositeOperation = 'source-over';
+           if (designDataUrl) {
+             const designImg = new window.Image();
+             designImg.onload = () => {
+               ctx.drawImage(designImg, 0, 0, 500, 600);
+               resolve(compositeCanvas.toDataURL('image/png'));
+             };
+             designImg.src = designDataUrl;
+           } else {
+             resolve(compositeCanvas.toDataURL('image/png'));
+           }
+         };
+         img.onerror = reject;
+      };
+
+      if (isCurrent && canvas) {
+        canvas.discardActiveObject();
+        canvas.requestRenderAll();
+        doComposite(canvas.toDataURL({ format: 'png', multiplier: 1 }));
+      } else if (state) {
+        const offscreenEl = document.createElement('canvas');
+        offscreenEl.width = 500;
+        offscreenEl.height = 600;
+        const staticCanvas = new fabric.StaticCanvas(offscreenEl);
+        staticCanvas.loadFromJSON(state, () => {
+          staticCanvas.renderAll();
+          // Small delay allows fabric to finish drawing i-text on the offscreen canvas
+          setTimeout(() => {
+            doComposite(staticCanvas.toDataURL({ format: 'png', multiplier: 1 }));
+          }, 150);
+        });
+      } else {
+        doComposite('');
+      }
+    });
+  };
+
   const handleSaveDesign = async () => {
     try {
-      const dataUrl = await generateCompositeImage();
-      const link = document.createElement('a');
-      link.download = 'my-custom-shirt.png';
-      link.href = dataUrl;
-      link.click();
+      const viewsToDownload: ViewType[] = ['front', 'back', 'left', 'right'];
+      
+      for (const view of viewsToDownload) {
+        const state = view === currentView ? (canvas ? canvas.toJSON() : null) : canvasStates[view];
+        if (!state || !state.objects || state.objects.length === 0) continue; // Only download views with designs
+        
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+          const offscreenEl = document.createElement('canvas');
+          offscreenEl.width = 500;
+          offscreenEl.height = 600;
+          const staticCanvas = new fabric.StaticCanvas(offscreenEl);
+          
+          const doComposite = (designDataUrl: string) => {
+             const compositeCanvas = document.createElement('canvas');
+             compositeCanvas.width = 500;
+             compositeCanvas.height = 600;
+             const ctx = compositeCanvas.getContext('2d');
+             if (!ctx) return resolve('');
+             
+             const img = new window.Image();
+             if (view === 'front') img.src = '/image copy 8.png';
+             else if (view === 'back') img.src = '/image.png';
+             else if (view === 'left') img.src = '/image copy.png';
+             else img.src = '/image copy 2.png';
+             
+             img.onload = () => {
+               ctx.fillStyle = shirtColor;
+               ctx.fillRect(0, 0, 500, 600);
+               ctx.globalCompositeOperation = 'destination-in';
+               const scale = Math.min(500 / img.width, 600 / img.height);
+               const w = img.width * scale;
+               const h = img.height * scale;
+               const x = (500 - w) / 2;
+               const y = (600 - h) / 2;
+               ctx.drawImage(img, x, y, w, h);
+               ctx.globalCompositeOperation = 'multiply';
+               ctx.drawImage(img, x, y, w, h);
+               ctx.globalCompositeOperation = 'source-over';
+               if (designDataUrl) {
+                 const designImg = new window.Image();
+                 designImg.onload = () => {
+                   ctx.drawImage(designImg, 0, 0, 500, 600);
+                   resolve(compositeCanvas.toDataURL('image/png'));
+                 };
+                 designImg.src = designDataUrl;
+               } else {
+                 resolve(compositeCanvas.toDataURL('image/png'));
+               }
+             };
+             img.onerror = reject;
+          };
+
+          if (state) {
+            staticCanvas.loadFromJSON(state, () => {
+              staticCanvas.renderAll();
+              doComposite(staticCanvas.toDataURL({ format: 'png', multiplier: 1 }));
+            });
+          } else {
+            doComposite('');
+          }
+        });
+
+        if (dataUrl) {
+          const link = document.createElement('a');
+          link.download = `my-custom-shirt-${view}.png`;
+          link.href = dataUrl;
+          link.click();
+          // Small delay to prevent browser blocking multiple downloads
+          await new Promise(r => setTimeout(r, 300));
+        }
+      }
     } catch (err) {
       console.error("Error saving design:", err);
     }
@@ -578,61 +785,102 @@ export default function DesignPage() {
     // Users can order blank shirts if they want to.
 
     try {
-      const dataUrl = await generateCompositeImage();
+      const frontImage = await generateImageForView('front');
+      const backImage = await generateImageForView('back');
+      const leftImage = await generateImageForView('left');
+      const rightImage = await generateImageForView('right');
       
       const designColors = new Set<string>();
       const frontColors = new Set<string>();
       const backColors = new Set<string>();
+      const leftColors = new Set<string>();
+      const rightColors = new Set<string>();
       let textCount = 0;
       let patchCount = 0;
 
-      const processObjects = (objects: any[], isFront: boolean, isBack: boolean) => {
+      const processObjects = (objects: any[], isFront: boolean, isBack: boolean, isLeft: boolean, isRight: boolean) => {
         objects.forEach((obj: any) => {
-          if (obj.type === 'i-text' || obj.type === 'text') {
+          const objType = (obj.type || '').toLowerCase().replace('-', '');
+          const addColor = (color: string) => {
+            if (!color || color === 'none' || color === 'transparent') return;
+            designColors.add(color);
+            if (isFront) frontColors.add(color);
+            if (isBack) backColors.add(color);
+            if (isLeft) leftColors.add(color);
+            if (isRight) rightColors.add(color);
+          };
+
+          if (objType === 'itext' || objType === 'text' || obj.sourceType === 'text') {
             textCount++;
-            if (obj.fill) { designColors.add(obj.fill as string); if (isFront) frontColors.add(obj.fill as string); if (isBack) backColors.add(obj.fill as string); }
-            if (obj.stroke) { designColors.add(obj.stroke as string); if (isFront) frontColors.add(obj.stroke as string); if (isBack) backColors.add(obj.stroke as string); }
-            if (obj.shadow && obj.shadow.color) { designColors.add(obj.shadow.color); if (isFront) frontColors.add(obj.shadow.color); if (isBack) backColors.add(obj.shadow.color); }
-          } else if (obj.type === 'path' || obj.type === 'image') {
+            addColor(obj.fill || '#000000');
+            if (obj.stroke) addColor(obj.stroke);
+            if (obj.shadow?.color) addColor(obj.shadow.color);
+          } else if (objType === 'path' || objType === 'image' || obj.sourceType === 'upload') {
             patchCount++;
-            if (obj.fill && obj.fill !== 'none') { designColors.add(obj.fill as string); if (isFront) frontColors.add(obj.fill as string); if (isBack) backColors.add(obj.fill as string); }
-            if (obj.stroke) { designColors.add(obj.stroke as string); if (isFront) frontColors.add(obj.stroke as string); if (isBack) backColors.add(obj.stroke as string); }
-          } else if (obj.type === 'group') {
+            addColor(obj.fill || '#000000');
+            if (obj.stroke) addColor(obj.stroke);
+          } else if (objType === 'group' || obj.sourceType === 'clipart') {
             patchCount++;
             const groupObjs = obj.objects || obj._objects || [];
             groupObjs.forEach((o: any) => {
-              if (o.fill && o.fill !== 'none') { designColors.add(o.fill as string); if (isFront) frontColors.add(o.fill as string); if (isBack) backColors.add(o.fill as string); }
-              if (o.stroke) { designColors.add(o.stroke as string); if (isFront) frontColors.add(o.stroke as string); if (isBack) backColors.add(o.stroke as string); }
+              addColor(o.fill || '#000000');
+              if (o.stroke) addColor(o.stroke);
             });
           }
         });
       };
 
       const views: ViewType[] = ['front', 'back', 'left', 'right'];
-      views.forEach(v => {
-        const objs = (currentView === v && canvas) ? canvas.getObjects() : (canvasStates[v]?.objects || []);
-        processObjects(objs, v === 'front', v === 'back');
-      });
+      let latestStates = canvasStates;
+      try {
+        const stored = sessionStorage.getItem('designerCanvasStates');
+        if (stored) latestStates = JSON.parse(stored);
+      } catch(e) {}
 
-      const basePrice = totalQuantity * 6.99;
-      const textPrice = textCount * 2.00;
-      const patchPrice = patchCount * 3.00;
-      const colorPrice = designColors.size * 1.50;
-      const finalPrice = basePrice + textPrice + patchPrice + colorPrice;
+      const getRealObjects = async (v: ViewType): Promise<any[]> => {
+        if (currentView === v && canvas) return canvas.getObjects();
+        const state = latestStates[v];
+        if (!state || !state.objects || state.objects.length === 0) return [];
+        // Read colors directly from JSON objects (no need to instantiate Fabric canvas)
+        return state.objects;
+      };
+
+      const frontObjs = await getRealObjects('front');
+      const backObjs = await getRealObjects('back');
+      const leftObjs = await getRealObjects('left');
+      const rightObjs = await getRealObjects('right');
+
+      console.log('[DEBUG] frontObjs:', JSON.stringify(frontObjs.map((o:any) => ({ type: o.type, sourceType: o.sourceType, fill: o.fill }))));
+      console.log('[DEBUG] backObjs:', JSON.stringify(backObjs.map((o:any) => ({ type: o.type, sourceType: o.sourceType, fill: o.fill }))));
+
+      processObjects(frontObjs, true, false, false, false);
+      processObjects(backObjs, false, true, false, false);
+      processObjects(leftObjs, false, false, true, false);
+      processObjects(rightObjs, false, false, false, true);
+
+      console.log('[DEBUG] frontColors:', Array.from(frontColors), 'backColors:', Array.from(backColors));
+
+      const basePrice = totalQuantity * pricing.basePrice;
+      const decorationPrice = totalQuantity * (pricing.frontPrice + pricing.backPrice + pricing.leftPrice + pricing.rightPrice);
+      const finalPrice = basePrice + decorationPrice;
 
       const newCheckoutData = {
         shirtColor,
         quantities,
+        pricePerShirt: PRICE_PER_SHIRT,
         totalPrice: finalPrice.toFixed(2),
-        frontImage: dataUrl,
+        frontImage: frontImage,
+        backImage: backImage,
+        leftImage: leftImage,
+        rightImage: rightImage,
         designColors: Array.from(designColors),
         frontColors: Array.from(frontColors),
         backColors: Array.from(backColors),
+        leftColors: Array.from(leftColors),
+        rightColors: Array.from(rightColors),
         pricingBreakdown: {
-          basePrice,
-          textPrice,
-          patchPrice,
-          colorPrice
+          basePrice: basePrice,
+          decorationPrice: decorationPrice
         }
       };
       
@@ -644,6 +892,13 @@ export default function DesignPage() {
       const mergedState = { ...existingState, ...newCheckoutData };
       sessionStorage.setItem('checkoutState', JSON.stringify(mergedState));
       sessionStorage.setItem('checkoutStep', '0'); // Reset step to Summary
+
+      // Save the latest state for the current view to ensure it's not lost on back navigation
+      if (canvas) {
+        const updatedStates = { ...canvasStates, [currentView]: canvas.toJSON(['sourceType']) };
+        sessionStorage.setItem('designerCanvasStates', JSON.stringify(updatedStates));
+      }
+
       router.push('/checkout');
     } catch (err) {
       console.error("Error during checkout:", err);
@@ -651,6 +906,17 @@ export default function DesignPage() {
     }
   };
 
+
+  const handleOpenQuoteModal = async () => {
+    try {
+      const dataUrl = await generateCompositeImage();
+      setQuoteImage(dataUrl);
+      setIsQuoteModalOpen(true);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to generate quote image.");
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -667,7 +933,7 @@ export default function DesignPage() {
             <small>per shirt ({totalQuantity})</small>
           </div>
           <button className={styles.saveBtn} onClick={handleResetDesign} style={{ color: '#dc3545', borderColor: '#dc3545' }}>Reset</button>
-          <button className={styles.quoteBtn} onClick={() => setIsQuoteModalOpen(true)}>Quote & Buy</button>
+          <button className={styles.quoteBtn} onClick={handleOpenQuoteModal}>Quote & Buy</button>
         </div>
       </div>
 
@@ -1121,32 +1387,10 @@ export default function DesignPage() {
               </div>
               <div className={styles.modalRightPanel}>
                 <div className={styles.shirtDetails}>
-                  <div className={styles.shirtThumbnailWrapper} style={{ position: 'relative', width: '80px', height: '80px', border: '1px solid #ddd', borderRadius: '4px', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <div style={{
-                      backgroundColor: shirtColor,
-                      maskImage: `url('${shirtImageSrc}')`,
-                      WebkitMaskImage: `url('${shirtImageSrc}')`,
-                      maskSize: 'contain',
-                      WebkitMaskSize: 'contain',
-                      maskPosition: 'center',
-                      WebkitMaskPosition: 'center',
-                      maskRepeat: 'no-repeat',
-                      WebkitMaskRepeat: 'no-repeat',
-                      position: 'absolute',
-                      top: '0.5rem', left: '0.5rem', right: '0.5rem', bottom: '0.5rem',
-                      zIndex: 1
-                    }}></div>
-                    <div style={{
-                      backgroundImage: `url('${shirtImageSrc}')`,
-                      backgroundSize: 'contain',
-                      backgroundPosition: 'center',
-                      backgroundRepeat: 'no-repeat',
-                      mixBlendMode: 'multiply',
-                      position: 'absolute',
-                      top: '0.5rem', left: '0.5rem', right: '0.5rem', bottom: '0.5rem',
-                      zIndex: 2,
-                      pointerEvents: 'none'
-                    }}></div>
+                  <div className={styles.shirtThumbnailWrapper} style={{ position: 'relative', width: '80px', height: '80px', border: '1px solid #ddd', borderRadius: '4px', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                    {quoteImage && (
+                      <img src={quoteImage} alt="Design Preview" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    )}
                   </div>
                   <div className={styles.shirtInfo}>
                     <h4>T-Shirts &gt; Short Sleeve Shirts</h4>

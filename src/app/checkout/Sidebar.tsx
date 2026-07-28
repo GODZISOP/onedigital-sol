@@ -36,25 +36,32 @@ export default function Sidebar({ data }: SidebarProps) {
     <aside className={styles.rightColumn}>
       <h3 className={styles.sidebarTitle}>Order Overview</h3>
       <div className={styles.sidebarMockups} style={{ flexDirection: 'column', gap: '1rem', overflowY: 'auto', maxHeight: '400px', paddingRight: '0.5rem' }}>
-        {data.frontImage && (
-          <div style={{ display: 'flex', gap: '0.5rem', width: '100%' }}>
-            <img src={data.frontImage} alt="Front" style={{ width: '50%', objectFit: 'contain' }} />
-            <div style={{ position: 'relative', width: '50%', border: '1px solid #eee', background: '#fcfcfc', overflow: 'hidden', aspectRatio: '500/600' }}>
-              <div style={{ 
-                position: 'absolute', 
-                inset: 0, 
-                backgroundColor: data.shirtColor || '#fff',
-                WebkitMaskImage: 'url(/image.png)',
-                WebkitMaskSize: 'contain',
-                WebkitMaskPosition: 'center',
-                WebkitMaskRepeat: 'no-repeat',
-                maskImage: 'url(/image.png)',
-                maskSize: 'contain',
-                maskPosition: 'center',
-                maskRepeat: 'no-repeat'
-              }}></div>
-              <img src="/image.png" alt="Back Mockup" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
-            </div>
+        {(data.frontImage || data.backImage || data.leftImage || data.rightImage || data.shirtColor) && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', width: '100%' }}>
+            {data.frontImage ? (
+              <img src={data.frontImage} alt="Front View" style={{ width: '100%', objectFit: 'contain', border: '1px solid #eee', background: '#fcfcfc', borderRadius: '4px' }} />
+            ) : (
+              <div style={{ position: 'relative', width: '100%', border: '1px solid #eee', background: '#fcfcfc', overflow: 'hidden', aspectRatio: '500/600', borderRadius: '4px' }}>
+                <div style={{ position: 'absolute', inset: 0, backgroundColor: data.shirtColor || '#fff', WebkitMaskImage: 'url(/image copy 8.png)', WebkitMaskSize: 'contain', WebkitMaskPosition: 'center', WebkitMaskRepeat: 'no-repeat', maskImage: 'url(/image copy 8.png)', maskSize: 'contain', maskPosition: 'center', maskRepeat: 'no-repeat' }}></div>
+                <img src="/image copy 8.png" alt="Front Mockup" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+              </div>
+            )}
+            
+            {data.backImage ? (
+              <img src={data.backImage} alt="Back View" style={{ width: '100%', objectFit: 'contain', border: '1px solid #eee', background: '#fcfcfc', borderRadius: '4px' }} />
+            ) : (
+              <div style={{ position: 'relative', width: '100%', border: '1px solid #eee', background: '#fcfcfc', overflow: 'hidden', aspectRatio: '500/600', borderRadius: '4px' }}>
+                <div style={{ position: 'absolute', inset: 0, backgroundColor: data.shirtColor || '#fff', WebkitMaskImage: 'url(/image.png)', WebkitMaskSize: 'contain', WebkitMaskPosition: 'center', WebkitMaskRepeat: 'no-repeat', maskImage: 'url(/image.png)', maskSize: 'contain', maskPosition: 'center', maskRepeat: 'no-repeat' }}></div>
+                <img src="/image.png" alt="Back Mockup" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+              </div>
+            )}
+            
+            {data.leftImage && (
+              <img src={data.leftImage} alt="Left View" style={{ width: '100%', objectFit: 'contain', border: '1px solid #eee', background: '#fcfcfc', borderRadius: '4px' }} />
+            )}
+            {data.rightImage && (
+              <img src={data.rightImage} alt="Right View" style={{ width: '100%', objectFit: 'contain', border: '1px solid #eee', background: '#fcfcfc', borderRadius: '4px' }} />
+            )}
           </div>
         )}
         
@@ -80,7 +87,12 @@ export default function Sidebar({ data }: SidebarProps) {
         </div>
         <div className={styles.sidebarRow}>
           <span>Print Colors</span>
-          <span>{data.frontColors?.length || 0} front, {data.backColors?.length || 0} back</span>
+          <span>
+            {data.frontColors?.length || 0} front, {data.backColors?.length || 0} back
+            {((data.leftColors?.length || 0) > 0 || (data.rightColors?.length || 0) > 0) && (
+              <>, {data.leftColors?.length || 0} left, {data.rightColors?.length || 0} right</>
+            )}
+          </span>
         </div>
         <div className={styles.sidebarRow}>
           <span>Delivery</span>
@@ -91,16 +103,8 @@ export default function Sidebar({ data }: SidebarProps) {
           <span>${baseShirtsPrice.toFixed(2)}</span>
         </div>
         <div className={styles.sidebarRow}>
-          <span>Text Elements</span>
-          <span>${data.pricingBreakdown?.textPrice?.toFixed(2) || '0.00'}</span>
-        </div>
-        <div className={styles.sidebarRow}>
-          <span>Patches / Art</span>
-          <span>${data.pricingBreakdown?.patchPrice?.toFixed(2) || '0.00'}</span>
-        </div>
-        <div className={styles.sidebarRow}>
-          <span>Ink Colors</span>
-          <span>${data.pricingBreakdown?.colorPrice?.toFixed(2) || '0.00'}</span>
+          <span>Custom Decorations</span>
+          <span>${data.pricingBreakdown?.decorationPrice?.toFixed(2) || '0.00'}</span>
         </div>
         <div className={styles.sidebarRow} style={{ fontWeight: 700, color: '#333', borderTop: '1px solid #eaeaea', marginTop: '0.5rem', paddingTop: '1rem' }}>
           <span>Total Price</span>

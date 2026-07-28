@@ -68,7 +68,7 @@ export default function CheckoutPage() {
 
   const renderStep = () => {
     // If the cart is empty AND there is no custom design in session storage, block checkout
-    if (items.length === 0 && !data?.frontImage && currentStep < 4) {
+    if (items.length === 0 && !data?.frontImage && !data?.backImage && !data?.leftImage && !data?.rightImage && currentStep < 4) {
       return (
         <div style={{ textAlign: 'center', padding: '4rem' }}>
           <h2>Your cart is empty.</h2>

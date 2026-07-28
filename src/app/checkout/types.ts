@@ -12,19 +12,22 @@ export interface CheckoutData {
   pricePerShirt: number;
   totalPrice: number;
   frontImage: string;
+  backImage?: string;
+  leftImage?: string;
+  rightImage?: string;
   shippingOption?: 'normal' | 'rush' | 'super-rush';
   shippingCost?: number;
   finalPrice?: number;
   designColors: string[];
   frontColors?: string[];
   backColors?: string[];
+  leftColors?: string[];
+  rightColors?: string[];
   instructions?: string;
   shippingDetails?: any;
   paymentDetails?: any;
   pricingBreakdown?: {
     basePrice: number;
-    textPrice: number;
-    patchPrice: number;
-    colorPrice: number;
+    decorationPrice: number;
   };
 }

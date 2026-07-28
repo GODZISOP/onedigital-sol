@@ -1,0 +1,39 @@
+.container {
+  min-height: 100vh;
+  background-color: white;
+}
+
+.hero {
+  background-color: #f9f9f9;
+  padding: 6rem 2rem;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+
+.title {
+  font-size: 3rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  color: black;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: #666;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #333;
+}
+
+.content p {
+  margin-bottom: 1.5rem;
+}

@@ -14,11 +14,13 @@ export default function InstructionsStep({ data, onNext }: InstructionsStepProps
   const [error, setError] = useState('');
   
   const hasCartItems = data?.items && data.items.length > 0;
-  const hasCustomDesign = !!data?.frontImage;
+  const hasCustomDesign = !!(data?.frontImage || data?.backImage || data?.leftImage || data?.rightImage);
   const legacyData = hasCustomDesign ? data : (data?.items?.[0]?.checkoutData || {});
   
   const frontColors = legacyData?.frontColors || legacyData?.designColors || [];
   const backColors = legacyData?.backColors || [];
+  const leftColors = legacyData?.leftColors || [];
+  const rightColors = legacyData?.rightColors || [];
 
   const handleProceed = () => {
     if (dimensionsOption === 'specify' && !instructions.trim()) {
@@ -50,7 +52,17 @@ export default function InstructionsStep({ data, onNext }: InstructionsStepProps
                 <span>{color}</span>
               </div>
             )) : (
-              <div style={{ color: '#666', fontSize: '0.9rem' }}>None</div>
+              <div style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1rem' }}>None</div>
+            )}
+
+            <div className={styles.mockupLabel}>Left Sleeve Print Colors ({leftColors.length})</div>
+            {leftColors.length > 0 ? leftColors.map((color: string, idx: number) => (
+              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                <div style={{ width: '20px', height: '20px', backgroundColor: color, border: '1px solid #ddd' }}></div>
+                <span>{color}</span>
+              </div>
+            )) : (
+              <div style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1rem' }}>None</div>
             )}
           </div>
           <div className={styles.flexHalf}>
@@ -67,7 +79,17 @@ export default function InstructionsStep({ data, onNext }: InstructionsStepProps
                 <span>{color}</span>
               </div>
             )) : (
-              <div style={{ color: '#666', fontSize: '0.9rem' }}>None</div>
+              <div style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1rem' }}>None</div>
+            )}
+
+            <div className={styles.mockupLabel}>Right Sleeve Print Colors ({rightColors.length})</div>
+            {rightColors.length > 0 ? rightColors.map((color: string, idx: number) => (
+              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                <div style={{ width: '20px', height: '20px', backgroundColor: color, border: '1px solid #ddd' }}></div>
+                <span>{color}</span>
+              </div>
+            )) : (
+              <div style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1rem' }}>None</div>
             )}
           </div>
         </div>

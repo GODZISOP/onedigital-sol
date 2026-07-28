@@ -12,7 +12,7 @@ export default function SummaryStep({ data, onNext }: SummaryStepProps) {
   const [error, setError] = useState('');
   
   const hasCartItems = data?.items && data.items.length > 0;
-  const hasCustomDesign = !!data?.frontImage;
+  const hasCustomDesign = !!(data?.frontImage || data?.backImage || data?.leftImage || data?.rightImage);
   
   // Custom design data is always stored directly on 'data' now
   const legacyData = data;
@@ -44,25 +44,23 @@ export default function SummaryStep({ data, onNext }: SummaryStepProps) {
   let patchCount = 0;
   let colorCount = 0;
 
+  let decorationTotal = 0;
+
   if (hasCartItems) {
     const items = data.items || [];
     totalQuantity += items.reduce((sum: number, item: any) => sum + item.totalQuantity, 0);
     basePrice += items.reduce((sum: number, item: any) => sum + (item.price * item.totalQuantity), 0);
-    textCount += items.reduce((sum: number, item: any) => sum + ((item.checkoutData?.pricingBreakdown?.textPrice || 0) / 2.0), 0);
-    patchCount += items.reduce((sum: number, item: any) => sum + ((item.checkoutData?.pricingBreakdown?.patchPrice || 0) / 3.0), 0);
-    colorCount += items.reduce((sum: number, item: any) => sum + ((item.checkoutData?.pricingBreakdown?.colorPrice || 0) / 1.5), 0);
+    decorationTotal += items.reduce((sum: number, item: any) => sum + (item.checkoutData?.pricingBreakdown?.decorationPrice || 0), 0);
   }
   
   if (hasCustomDesign) {
     const customQty = Object.values(localQuantities).reduce((a: any, b: any) => a + (parseInt(b as string) || 0), 0);
     totalQuantity += customQty;
-    basePrice += customQty * 6.99;
-    textCount += data?.pricingBreakdown?.textPrice ? (data.pricingBreakdown.textPrice / 2.00) : 0;
-    patchCount += data?.pricingBreakdown?.patchPrice ? (data.pricingBreakdown.patchPrice / 3.00) : 0;
-    colorCount += data?.pricingBreakdown?.colorPrice ? (data.pricingBreakdown.colorPrice / 1.50) : 0;
+    basePrice += customQty * 6.98;
+    decorationTotal += (data?.pricingBreakdown?.decorationPrice || 0) * customQty;
   }
   
-  const totalItemsPrice = basePrice + (textCount * 2.0) + (patchCount * 3.0) + (colorCount * 1.5);
+  const totalItemsPrice = basePrice + decorationTotal;
   
   let finalPrice = totalItemsPrice;
   if (shippingOption === 'rush') finalPrice *= 1.25;
@@ -183,14 +181,12 @@ export default function SummaryStep({ data, onNext }: SummaryStepProps) {
                   .filter(([_, q]) => (q as number) > 0)
                   .map(([s, q]) => `${s} (Qty: ${q})`)
                   .join(', ');
-                const customPrice = (customQty * 6.99) 
-                  + (data?.pricingBreakdown?.textPrice || 0) 
-                  + (data?.pricingBreakdown?.patchPrice || 0) 
-                  + (data?.pricingBreakdown?.colorPrice || 0);
+                const customPrice = (customQty * 6.98) 
+                  + (data?.pricingBreakdown?.decorationPrice || 0);
 
                 return (
                   <div style={{ display: 'flex', gap: '1rem', padding: '1rem', backgroundColor: '#f9f9f9', border: '1px solid #ddd', borderRadius: '8px', marginBottom: '1.5rem' }}>
-                    <img src={data.frontImage} alt="Custom Shirt Design" style={{ width: '80px', height: '80px', objectFit: 'contain' }} />
+                    <img src={data.frontImage || data.backImage || data.leftImage || data.rightImage} alt="Custom Shirt Design" style={{ width: '80px', height: '80px', objectFit: 'contain' }} />
                     <div>
                       <h4 style={{ margin: '0 0 0.5rem 0' }}>Custom T-Shirt Design</h4>
                       <p style={{ margin: '0 0 0.25rem 0', color: '#666' }}>Size: {sizeString}</p>
@@ -200,46 +196,45 @@ export default function SummaryStep({ data, onNext }: SummaryStepProps) {
                   </div>
                 );
               })()}
-              <div className={styles.flexRow} style={{ marginTop: '2rem' }}>
-                <div style={{ flex: 1 }}>
-                  <div className={styles.mockupLabel}>Front: {legacyData?.frontColors?.length || legacyData?.designColors?.length || 0} colors</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '2rem' }}>
+                <div>
+                  <div className={styles.mockupLabel}>Front Design Preview</div>
                   <div style={{ position: 'relative', width: '100%', border: '1px solid #eee', background: '#fcfcfc', aspectRatio: '500/600', overflow: 'hidden' }}>
-                    <div style={{ 
-                      position: 'absolute', 
-                      inset: 0, 
-                      backgroundColor: legacyData?.shirtColor || '#fff',
-                      WebkitMaskImage: 'url(/image.png)',
-                      WebkitMaskSize: 'contain',
-                      WebkitMaskPosition: 'center',
-                      WebkitMaskRepeat: 'no-repeat',
-                      maskImage: 'url(/image.png)',
-                      maskSize: 'contain',
-                      maskPosition: 'center',
-                      maskRepeat: 'no-repeat'
-                    }}></div>
-                    <img src="/image.png" alt="Front Mockup" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+                    <div style={{ position: 'absolute', inset: 0, backgroundColor: legacyData?.shirtColor || '#fff', WebkitMaskImage: "url('/image copy 8.png')", WebkitMaskSize: 'contain', WebkitMaskPosition: 'center', WebkitMaskRepeat: 'no-repeat', maskImage: "url('/image copy 8.png')", maskSize: 'contain', maskPosition: 'center', maskRepeat: 'no-repeat' }}></div>
+                    <img src="/image copy 8.png" alt="Front Mockup" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
                     {legacyData?.frontImage && (
-                      <img src={legacyData.frontImage} alt="Custom Design" style={{ position: 'absolute', inset: '0', width: '100%', height: '100%', objectFit: 'contain', zIndex: 2 }} />
+                      <img src={legacyData.frontImage} alt="Custom Front" style={{ position: 'absolute', inset: '0', width: '100%', height: '100%', objectFit: 'contain', zIndex: 2 }} />
                     )}
                   </div>
                 </div>
-                <div style={{ flex: 1 }}>
-                  <div className={styles.mockupLabel}>Back Print Colors: {legacyData?.backColors?.length || 0}</div>
+                <div>
+                  <div className={styles.mockupLabel}>Back Design Preview</div>
                   <div style={{ position: 'relative', width: '100%', border: '1px solid #eee', background: '#fcfcfc', aspectRatio: '500/600', overflow: 'hidden' }}>
-                    <div style={{ 
-                      position: 'absolute', 
-                      inset: 0, 
-                      backgroundColor: legacyData?.shirtColor || '#fff',
-                      WebkitMaskImage: 'url(/image.png)',
-                      WebkitMaskSize: 'contain',
-                      WebkitMaskPosition: 'center',
-                      WebkitMaskRepeat: 'no-repeat',
-                      maskImage: 'url(/image.png)',
-                      maskSize: 'contain',
-                      maskPosition: 'center',
-                      maskRepeat: 'no-repeat'
-                    }}></div>
+                    <div style={{ position: 'absolute', inset: 0, backgroundColor: legacyData?.shirtColor || '#fff', WebkitMaskImage: "url('/image.png')", WebkitMaskSize: 'contain', WebkitMaskPosition: 'center', WebkitMaskRepeat: 'no-repeat', maskImage: "url('/image.png')", maskSize: 'contain', maskPosition: 'center', maskRepeat: 'no-repeat' }}></div>
                     <img src="/image.png" alt="Back Mockup" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+                    {legacyData?.backImage && (
+                      <img src={legacyData.backImage} alt="Custom Back" style={{ position: 'absolute', inset: '0', width: '100%', height: '100%', objectFit: 'contain', zIndex: 2 }} />
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <div className={styles.mockupLabel}>Left Sleeve Preview</div>
+                  <div style={{ position: 'relative', width: '100%', border: '1px solid #eee', background: '#fcfcfc', aspectRatio: '500/600', overflow: 'hidden' }}>
+                    <div style={{ position: 'absolute', inset: 0, backgroundColor: legacyData?.shirtColor || '#fff', WebkitMaskImage: "url('/image copy.png')", WebkitMaskSize: 'contain', WebkitMaskPosition: 'center', WebkitMaskRepeat: 'no-repeat', maskImage: "url('/image copy.png')", maskSize: 'contain', maskPosition: 'center', maskRepeat: 'no-repeat' }}></div>
+                    <img src="/image copy.png" alt="Left Mockup" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+                    {legacyData?.leftImage && (
+                      <img src={legacyData.leftImage} alt="Custom Left" style={{ position: 'absolute', inset: '0', width: '100%', height: '100%', objectFit: 'contain', zIndex: 2 }} />
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <div className={styles.mockupLabel}>Right Sleeve Preview</div>
+                  <div style={{ position: 'relative', width: '100%', border: '1px solid #eee', background: '#fcfcfc', aspectRatio: '500/600', overflow: 'hidden' }}>
+                    <div style={{ position: 'absolute', inset: 0, backgroundColor: legacyData?.shirtColor || '#fff', WebkitMaskImage: "url('/image copy 2.png')", WebkitMaskSize: 'contain', WebkitMaskPosition: 'center', WebkitMaskRepeat: 'no-repeat', maskImage: "url('/image copy 2.png')", maskSize: 'contain', maskPosition: 'center', maskRepeat: 'no-repeat' }}></div>
+                    <img src="/image copy 2.png" alt="Right Mockup" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+                    {legacyData?.rightImage && (
+                      <img src={legacyData.rightImage} alt="Custom Right" style={{ position: 'absolute', inset: '0', width: '100%', height: '100%', objectFit: 'contain', zIndex: 2 }} />
+                    )}
                   </div>
                 </div>
               </div>
@@ -248,71 +243,62 @@ export default function SummaryStep({ data, onNext }: SummaryStepProps) {
         </div>
         
         <div className={styles.flexHalf}>
-          <h3 className={styles.sectionTitle} style={{ marginTop: 0 }}>Delivery Options</h3>
-          
-          <label className={styles.radioLabel}>
-            <input 
-              type="radio" 
-              name="delivery" 
-              value="normal" 
-              checked={shippingOption === 'normal'}
-              onChange={() => setShippingOption('normal')} 
-            />
-            Normal Shipping (Free!)
-          </label>
-          <div className={styles.deliveryDate}>Guaranteed: August 11</div>
-          
-          <label className={styles.radioLabel}>
-            <input 
-              type="radio" 
-              name="delivery" 
-              value="rush" 
-              checked={shippingOption === 'rush'}
-              onChange={() => setShippingOption('rush')} 
-            />
-            Rush Shipping (+25%)
-          </label>
-          <div className={styles.deliveryDate}>Guaranteed: August 4</div>
-          
-          <label className={styles.radioLabel}>
-            <input 
-              type="radio" 
-              name="delivery" 
-              value="super-rush" 
-              checked={shippingOption === 'super-rush'}
-              onChange={() => setShippingOption('super-rush')} 
-            />
-            Super-rush Shipping (+50%)
-          </label>
-          <div className={styles.deliveryDate}>Guaranteed: July 31</div>
-          
-          <h3 className={styles.sectionTitle} style={{ marginTop: '3rem' }}>Pricing Breakdown</h3>
-          <div style={{ maxWidth: '400px', backgroundColor: '#f9f9f9', padding: '1.5rem', borderRadius: '8px', border: '1px solid #eaeaea' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-              <span>Base Custom T-Shirts (Qty: {totalQuantity})</span>
-              <span>${basePrice.toFixed(2)}</span>
+          <div className={styles.sidebar}>
+            <h3>Delivery Options</h3>
+            <div className={styles.radioGroup}>
+              <label className={styles.radioLabel}>
+                <input 
+                  type="radio" 
+                  name="shipping" 
+                  value="normal" 
+                  checked={shippingOption === 'normal'}
+                  onChange={(e) => setShippingOption(e.target.value as any)}
+                />
+                Normal Shipping (Free!)
+                <span className={styles.shippingDate}>Guaranteed: August 11</span>
+              </label>
+              <label className={styles.radioLabel}>
+                <input 
+                  type="radio" 
+                  name="shipping" 
+                  value="rush" 
+                  checked={shippingOption === 'rush'}
+                  onChange={(e) => setShippingOption(e.target.value as any)}
+                />
+                Rush Shipping (+25%)
+                <span className={styles.shippingDate}>Guaranteed: August 4</span>
+              </label>
+              <label className={styles.radioLabel}>
+                <input 
+                  type="radio" 
+                  name="shipping" 
+                  value="super-rush" 
+                  checked={shippingOption === 'super-rush'}
+                  onChange={(e) => setShippingOption(e.target.value as any)}
+                />
+                Super-rush Shipping (+50%)
+                <span className={styles.shippingDate}>Guaranteed: July 31</span>
+              </label>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-              <span>Text Elements</span>
-              <span>${(textCount * 2.0).toFixed(2)}</span>
+
+            <h3 style={{ marginTop: '2rem' }}>Pricing Breakdown</h3>
+            <div className={styles.pricingBox}>
+              <div className={styles.pricingRow}>
+                <span>Base Custom T-Shirts (Qty: {totalQuantity})</span>
+                <span>${basePrice.toFixed(2)}</span>
+              </div>
+              <div className={styles.pricingRow}>
+                <span>Custom Decorations</span>
+                <span>${decorationTotal.toFixed(2)}</span>
+              </div>
+              <div className={styles.pricingRow} style={{ borderTop: '1px solid #ddd', marginTop: '1rem', paddingTop: '1rem', fontWeight: 'bold', fontSize: '1.2rem' }}>
+                <span>Total Price</span>
+                <span>${finalPrice.toFixed(2)}</span>
+              </div>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-              <span>Clipart / Patches</span>
-              <span>${(patchCount * 3.0).toFixed(2)}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', borderBottom: '1px solid #ddd', paddingBottom: '1rem' }}>
-              <span>Ink Colors</span>
-              <span>${(colorCount * 1.5).toFixed(2)}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: '1.2rem', color: '#333' }}>
-              <span>Total Price</span>
-              <span>${totalItemsPrice.toFixed(2)}</span>
-            </div>
+            
+            <button className={styles.primaryButton} onClick={handleProceed} style={{ marginTop: '2rem', width: '100%' }}>PROCEED WITH CHECKOUT</button>
           </div>
-          
-          <button className={styles.primaryButton} onClick={handleProceed} style={{ marginTop: '2rem' }}>
-            Proceed with Checkout
-          </button>
         </div>
       </div>
     </div>

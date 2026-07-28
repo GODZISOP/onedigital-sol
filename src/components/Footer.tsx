@@ -38,8 +38,11 @@ export default function Footer() {
 
         <div className={styles.column}>
           <h3 className={styles.colTitle}>CONTACT</h3>
-          <div className={styles.contactItem}>
-            <Phone size={16} /> (910) 865-1070
+          <div className={styles.contactItem} style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Phone size={16} /> (910) 865-1070
+            </div>
+            <span style={{ fontSize: '0.85rem', color: '#666', marginLeft: '1.5rem', marginTop: '0.2rem' }}>(Ask for Amber or Brian)</span>
           </div>
           <div className={styles.contactItem}>
             <MapPin size={16} /> 781 Tobermory Rd. Fayetteville,NC 28306
