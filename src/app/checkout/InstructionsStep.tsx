@@ -36,75 +36,79 @@ export default function InstructionsStep({ data, onNext }: InstructionsStepProps
         <h2 className={styles.pageTitle}>Design Instructions</h2>
         {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
         
-        <h3 className={styles.sectionTitle}>Selected Colors</h3>
-        <div className={styles.flexRow}>
-          <div className={styles.flexHalf}>
-            <div className={styles.mockupLabel}>Front Shirt Color</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-              <div style={{ width: '20px', height: '20px', backgroundColor: legacyData?.shirtColor || '#fff', border: '1px solid #ddd' }}></div>
-              <span style={{ textTransform: 'capitalize' }}>{legacyData?.shirtColor || 'White'}</span>
+        {hasCustomDesign && (
+          <>
+            <h3 className={styles.sectionTitle}>Selected Colors</h3>
+            <div className={styles.flexRow}>
+              <div className={styles.flexHalf}>
+                <div className={styles.mockupLabel}>Front Shirt Color</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                  <div style={{ width: '20px', height: '20px', backgroundColor: legacyData?.shirtColor || '#fff', border: '1px solid #ddd' }}></div>
+                  <span style={{ textTransform: 'capitalize' }}>{legacyData?.shirtColor || 'White'}</span>
+                </div>
+                
+                <div className={styles.mockupLabel}>Front Print Colors ({frontColors.length})</div>
+                {frontColors.length > 0 ? frontColors.map((color: string, idx: number) => (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                    <div style={{ width: '20px', height: '20px', backgroundColor: color, border: '1px solid #ddd' }}></div>
+                    <span>{color}</span>
+                  </div>
+                )) : (
+                  <div style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1rem' }}>None</div>
+                )}
+
+                <div className={styles.mockupLabel}>Left Sleeve Print Colors ({leftColors.length})</div>
+                {leftColors.length > 0 ? leftColors.map((color: string, idx: number) => (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                    <div style={{ width: '20px', height: '20px', backgroundColor: color, border: '1px solid #ddd' }}></div>
+                    <span>{color}</span>
+                  </div>
+                )) : (
+                  <div style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1rem' }}>None</div>
+                )}
+              </div>
+              <div className={styles.flexHalf}>
+                <div className={styles.mockupLabel}>Back Shirt Color</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                  <div style={{ width: '20px', height: '20px', backgroundColor: legacyData?.shirtColor || '#fff', border: '1px solid #ddd' }}></div>
+                  <span style={{ textTransform: 'capitalize' }}>{legacyData?.shirtColor || 'White'}</span>
+                </div>
+
+                <div className={styles.mockupLabel}>Back Print Colors ({backColors.length})</div>
+                {backColors.length > 0 ? backColors.map((color: string, idx: number) => (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                    <div style={{ width: '20px', height: '20px', backgroundColor: color, border: '1px solid #ddd' }}></div>
+                    <span>{color}</span>
+                  </div>
+                )) : (
+                  <div style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1rem' }}>None</div>
+                )}
+
+                <div className={styles.mockupLabel}>Right Sleeve Print Colors ({rightColors.length})</div>
+                {rightColors.length > 0 ? rightColors.map((color: string, idx: number) => (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                    <div style={{ width: '20px', height: '20px', backgroundColor: color, border: '1px solid #ddd' }}></div>
+                    <span>{color}</span>
+                  </div>
+                )) : (
+                  <div style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1rem' }}>None</div>
+                )}
+              </div>
             </div>
-            
-            <div className={styles.mockupLabel}>Front Print Colors ({frontColors.length})</div>
-            {frontColors.length > 0 ? frontColors.map((color: string, idx: number) => (
-              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                <div style={{ width: '20px', height: '20px', backgroundColor: color, border: '1px solid #ddd' }}></div>
-                <span>{color}</span>
-              </div>
-            )) : (
-              <div style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1rem' }}>None</div>
-            )}
 
-            <div className={styles.mockupLabel}>Left Sleeve Print Colors ({leftColors.length})</div>
-            {leftColors.length > 0 ? leftColors.map((color: string, idx: number) => (
-              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                <div style={{ width: '20px', height: '20px', backgroundColor: color, border: '1px solid #ddd' }}></div>
-                <span>{color}</span>
-              </div>
-            )) : (
-              <div style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1rem' }}>None</div>
-            )}
-          </div>
-          <div className={styles.flexHalf}>
-            <div className={styles.mockupLabel}>Back Shirt Color</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-              <div style={{ width: '20px', height: '20px', backgroundColor: legacyData?.shirtColor || '#fff', border: '1px solid #ddd' }}></div>
-              <span style={{ textTransform: 'capitalize' }}>{legacyData?.shirtColor || 'White'}</span>
+            <h3 className={styles.sectionTitle}>Design Dimensions</h3>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label className={styles.radioLabel}>
+                <input type="radio" name="dimensions" checked={dimensionsOption === 'default'} onChange={() => { setDimensionsOption('default'); setError(''); }} />
+                Let us decide for you based on standard printing dimensions (?)
+              </label>
+              <label className={styles.radioLabel}>
+                <input type="radio" name="dimensions" checked={dimensionsOption === 'specify'} onChange={() => setDimensionsOption('specify')} />
+                Specify dimensions
+              </label>
             </div>
-
-            <div className={styles.mockupLabel}>Back Print Colors ({backColors.length})</div>
-            {backColors.length > 0 ? backColors.map((color: string, idx: number) => (
-              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                <div style={{ width: '20px', height: '20px', backgroundColor: color, border: '1px solid #ddd' }}></div>
-                <span>{color}</span>
-              </div>
-            )) : (
-              <div style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1rem' }}>None</div>
-            )}
-
-            <div className={styles.mockupLabel}>Right Sleeve Print Colors ({rightColors.length})</div>
-            {rightColors.length > 0 ? rightColors.map((color: string, idx: number) => (
-              <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                <div style={{ width: '20px', height: '20px', backgroundColor: color, border: '1px solid #ddd' }}></div>
-                <span>{color}</span>
-              </div>
-            )) : (
-              <div style={{ color: '#666', fontSize: '0.9rem', marginBottom: '1rem' }}>None</div>
-            )}
-          </div>
-        </div>
-
-        <h3 className={styles.sectionTitle}>Design Dimensions</h3>
-        <div style={{ marginBottom: '1.5rem' }}>
-          <label className={styles.radioLabel}>
-            <input type="radio" name="dimensions" checked={dimensionsOption === 'default'} onChange={() => { setDimensionsOption('default'); setError(''); }} />
-            Let us decide for you based on standard printing dimensions (?)
-          </label>
-          <label className={styles.radioLabel}>
-            <input type="radio" name="dimensions" checked={dimensionsOption === 'specify'} onChange={() => setDimensionsOption('specify')} />
-            Specify dimensions
-          </label>
-        </div>
+          </>
+        )}
 
         <h3 className={styles.sectionTitle}>Other Instructions</h3>
         <div style={{ marginBottom: '2rem' }}>

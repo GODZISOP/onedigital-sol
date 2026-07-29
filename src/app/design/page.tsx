@@ -189,17 +189,20 @@ export default function DesignPage() {
       return total;
     };
 
-    if (canvas && canvas.getObjects().length > 0) {
-      if (currentView === 'front') breakdown.frontPrice = analyzeCanvas(canvas.getObjects(), 'front');
-      if (currentView === 'back') breakdown.backPrice = analyzeCanvas(canvas.getObjects(), 'back');
-      if (currentView === 'left') breakdown.leftPrice = analyzeCanvas(canvas.getObjects(), 'left');
-      if (currentView === 'right') breakdown.rightPrice = analyzeCanvas(canvas.getObjects(), 'right');
+    // Use unified JSON state for all views to ensure consistency
+    const statesToAnalyze = { ...canvasStates };
+    if (canvas) {
+      if (canvas.getObjects().length > 0) {
+        statesToAnalyze[currentView] = canvas.toJSON(['sourceType']);
+      } else {
+        statesToAnalyze[currentView] = null;
+      }
     }
 
-    Object.keys(canvasStates).forEach(key => {
+    Object.keys(statesToAnalyze).forEach(key => {
       const view = key as ViewType;
-      if (view !== currentView && canvasStates[view]?.objects?.length > 0) {
-        const cost = analyzeCanvas(canvasStates[view].objects, view);
+      if (statesToAnalyze[view]?.objects?.length > 0) {
+        const cost = analyzeCanvas(statesToAnalyze[view].objects, view);
         if (view === 'front') breakdown.frontPrice = cost;
         if (view === 'back') breakdown.backPrice = cost;
         if (view === 'left') breakdown.leftPrice = cost;
@@ -617,13 +620,6 @@ export default function DesignPage() {
   const generateImageForView = async (view: ViewType): Promise<string> => {
     const isCurrent = currentView === view;
     const state = isCurrent || !canvasStates[view] ? null : JSON.parse(JSON.stringify(canvasStates[view]));
-    
-    // If it's the current view and canvas is empty, or if it's a saved state and it's empty, return ''
-    if (isCurrent) {
-      if (!canvas || canvas.getObjects().length === 0) return '';
-    } else {
-      if (!state || !state.objects || state.objects.length === 0) return '';
-    }
     
     return new Promise<string>((resolve, reject) => {
       const doComposite = (designDataUrl: string) => {

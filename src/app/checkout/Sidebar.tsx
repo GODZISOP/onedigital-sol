@@ -10,14 +10,12 @@ export default function Sidebar({ data }: SidebarProps) {
   if (!data) return null;
 
   let totalQuantity = 0;
-  let finalPrice = 0;
   let baseShirtsPrice = 0;
+  const finalPrice = typeof data.finalPrice === 'string' ? parseFloat(data.finalPrice) : (data.finalPrice || 0);
 
   if (data.items && data.items.length > 0) {
     data.items.forEach((item: any) => {
       totalQuantity += item.totalQuantity || 0;
-      finalPrice += (item.price * item.totalQuantity) || 0;
-      baseShirtsPrice += (item.price * item.totalQuantity) || 0;
     });
   }
 
@@ -26,12 +24,36 @@ export default function Sidebar({ data }: SidebarProps) {
   }
 
   if (data.pricingBreakdown) {
-    baseShirtsPrice += data.pricingBreakdown.basePrice || 0;
+    baseShirtsPrice = data.pricingBreakdown.basePrice || 0;
+  } else {
+    if (data.items && data.items.length > 0) {
+      data.items.forEach((item: any) => {
+        baseShirtsPrice += (item.price * item.totalQuantity) || 0;
+      });
+    }
   }
 
-  if (data.finalPrice || data.totalPrice) {
-    finalPrice += parseFloat(String(data.finalPrice || data.totalPrice)) || 0;
-  }
+  const getDeliveryDate = (option: string | undefined) => {
+    const minDays = option === 'super-rush' ? 2 : option === 'rush' ? 5 : 7;
+    const maxDays = option === 'super-rush' ? 3 : option === 'rush' ? 7 : 10;
+    const minDate = new Date();
+    minDate.setDate(minDate.getDate() + minDays);
+    const maxDate = new Date();
+    maxDate.setDate(maxDate.getDate() + maxDays);
+    return `${minDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${maxDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+  };
+
+  const hasCustomDesign = !!(
+    data.frontImage || 
+    data.backImage || 
+    data.leftImage || 
+    data.rightImage || 
+    data.frontColors?.length ||
+    (data.quantities && Object.values(data.quantities).reduce((a: any, b: any) => a + (parseInt(b as string) || 0), 0) > 0)
+  );
+
+  const currentDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
   return (
     <aside className={styles.rightColumn}>
       <h3 className={styles.sidebarTitle}>Order Overview</h3>
@@ -82,30 +104,43 @@ export default function Sidebar({ data }: SidebarProps) {
       
       <div className={styles.sidebarStats}>
         <div className={styles.sidebarRow}>
+          <span>Order Date</span>
+          <span>{currentDate}</span>
+        </div>
+        <div className={styles.sidebarRow}>
           <span>Quantity</span>
           <span>{totalQuantity}</span>
         </div>
+        
+        {hasCustomDesign && (
+          <div className={styles.sidebarRow}>
+            <span>Print Colors</span>
+            <span>
+              {data.frontColors?.length || 0} front, {data.backColors?.length || 0} back
+              {((data.leftColors?.length || 0) > 0 || (data.rightColors?.length || 0) > 0) && (
+                <>, {data.leftColors?.length || 0} left, {data.rightColors?.length || 0} right</>
+              )}
+            </span>
+          </div>
+        )}
+
         <div className={styles.sidebarRow}>
-          <span>Print Colors</span>
-          <span>
-            {data.frontColors?.length || 0} front, {data.backColors?.length || 0} back
-            {((data.leftColors?.length || 0) > 0 || (data.rightColors?.length || 0) > 0) && (
-              <>, {data.leftColors?.length || 0} left, {data.rightColors?.length || 0} right</>
-            )}
-          </span>
+          <span>Est. Delivery</span>
+          <span>{getDeliveryDate(data.shippingOption)}</span>
         </div>
-        <div className={styles.sidebarRow}>
-          <span>Delivery</span>
-          <span>{data.shippingOption === 'super-rush' ? 'July 31' : data.shippingOption === 'rush' ? 'August 4' : 'August 11'}</span>
-        </div>
+
         <div className={styles.sidebarRow} style={{ borderTop: '1px solid #eaeaea', marginTop: '1rem', paddingTop: '1rem' }}>
-          <span>Base Shirts</span>
+          <span>{hasCustomDesign ? 'Base Shirts' : 'Items Total'}</span>
           <span>${baseShirtsPrice.toFixed(2)}</span>
         </div>
-        <div className={styles.sidebarRow}>
-          <span>Custom Decorations</span>
-          <span>${data.pricingBreakdown?.decorationPrice?.toFixed(2) || '0.00'}</span>
-        </div>
+        
+        {hasCustomDesign && (
+          <div className={styles.sidebarRow}>
+            <span>Custom Decorations</span>
+            <span>${data.pricingBreakdown?.decorationPrice?.toFixed(2) || '0.00'}</span>
+          </div>
+        )}
+
         <div className={styles.sidebarRow} style={{ fontWeight: 700, color: '#333', borderTop: '1px solid #eaeaea', marginTop: '0.5rem', paddingTop: '1rem' }}>
           <span>Total Price</span>
           <span>${finalPrice.toFixed(2)}</span>

@@ -9,6 +9,6 @@ export const dummyProducts = [
   { id: 6, name: 'DRYFIT - CAROLINA DARK HORSES', category: 'Performance', sizes: ['S', 'M', 'L', 'XL'], price: 35.00, image: '/carolina_darkhorses.png', description: 'Carolina Dark Horses Dry Fit performance wear. High-quality fabric for ultimate comfort.' },
   { id: 7, name: 'CUSTOM SUBLIMATED PANTS', category: 'Pants', sizes: ['S', 'M', 'L', 'XL'], price: 45.00, image: '/pants.png', description: 'Complete your uniform with our Custom Sublimated Athletic Pants. Engineered for extreme durability and flexibility, these pants feature reinforced stitching and a comfortable elastic waistband. The advanced sublimation process ensures your team colors stay bright and bold all season long.' },
   // Hats
-  { id: 8, name: 'HC5 TRUCKER HAT', category: 'Hat', sizes: ['One Size'], price: 20.00, image: '/dawgs_hat.png', description: 'Classic HC5 Trucker Hat. Features a breathable mesh back and a comfortable fit.' },
-  { id: 9, name: 'HC1 SNAPBACK HAT', category: 'Hat', sizes: ['One Size'], price: 25.00, image: '/hc1_snapback.png', description: 'Premium HC1 Snapback Hat. Stylish, durable, and adjustable for the perfect fit.' },
+  { id: 8, name: 'HC5 TRUCKER SNAPBACK HAT', category: 'Hat', sizes: ['One Size'], price: 20.00, image: '/dawgs_hat.png', description: 'Classic HC5 Trucker Snapback Hat. Features a breathable mesh back and an adjustable snapback fit.' },
+  { id: 9, name: 'HC1 FITTED HAT', category: 'Hat', sizes: ['S/M', 'L/XL'], price: 25.00, image: '/hc1_snapback.png', description: 'Premium HC1 Fitted Hat. Stylish, durable, and structured for a precise, comfortable fit.' },
 ];

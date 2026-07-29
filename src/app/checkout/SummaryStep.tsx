@@ -12,7 +12,15 @@ export default function SummaryStep({ data, onNext }: SummaryStepProps) {
   const [error, setError] = useState('');
   
   const hasCartItems = data?.items && data.items.length > 0;
-  const hasCustomDesign = !!(data?.frontImage || data?.backImage || data?.leftImage || data?.rightImage);
+  
+  // Custom design is present if there are mockups OR if quantities were specified in the design lab
+  const hasCustomDesign = !!(
+    data?.frontImage || 
+    data?.backImage || 
+    data?.leftImage || 
+    data?.rightImage || 
+    (data?.quantities && Object.values(data.quantities).reduce((a: any, b: any) => a + (parseInt(b as string) || 0), 0) > 0)
+  );
   
   // Custom design data is always stored directly on 'data' now
   const legacyData = data;
@@ -24,6 +32,12 @@ export default function SummaryStep({ data, onNext }: SummaryStepProps) {
       setShippingOption(data.shippingOption);
     }
   }, [data]);
+
+  useEffect(() => {
+    if (data?.quantities) {
+      setLocalQuantities(data.quantities);
+    }
+  }, [data?.quantities]);
 
   if (!data) return <div>Loading...</div>;
 
@@ -57,7 +71,13 @@ export default function SummaryStep({ data, onNext }: SummaryStepProps) {
     const customQty = Object.values(localQuantities).reduce((a: any, b: any) => a + (parseInt(b as string) || 0), 0);
     totalQuantity += customQty;
     basePrice += customQty * 6.98;
-    decorationTotal += (data?.pricingBreakdown?.decorationPrice || 0) * customQty;
+    
+    // Divide total decoration price by original quantity to get per-shirt decoration price, then multiply by new customQty
+    const originalQty = data.quantities 
+      ? (Object.values(data.quantities).reduce((a: any, b: any) => a + (parseInt(b as string) || 0), 0) || 1)
+      : 1;
+    const decorationPricePerShirt = (data.pricingBreakdown?.decorationPrice || 0) / originalQty;
+    decorationTotal += decorationPricePerShirt * customQty;
   }
   
   const totalItemsPrice = basePrice + decorationTotal;
@@ -107,6 +127,7 @@ export default function SummaryStep({ data, onNext }: SummaryStepProps) {
 
     outputData.pricingBreakdown = { 
       basePrice, 
+      decorationPrice: decorationTotal,
       textPrice: textCount * 2, 
       patchPrice: patchCount * 3, 
       colorPrice: colorCount * 1.5 
@@ -184,9 +205,18 @@ export default function SummaryStep({ data, onNext }: SummaryStepProps) {
                 const customPrice = (customQty * 6.98) 
                   + (data?.pricingBreakdown?.decorationPrice || 0);
 
-                return (
+                 return (
                   <div style={{ display: 'flex', gap: '1rem', padding: '1rem', backgroundColor: '#f9f9f9', border: '1px solid #ddd', borderRadius: '8px', marginBottom: '1.5rem' }}>
-                    <img src={data.frontImage || data.backImage || data.leftImage || data.rightImage} alt="Custom Shirt Design" style={{ width: '80px', height: '80px', objectFit: 'contain' }} />
+                    <div style={{ position: 'relative', width: '80px', height: '80px', border: '1px solid #ddd', background: '#fcfcfc', overflow: 'hidden', borderRadius: '6px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {legacyData?.frontImage || legacyData?.backImage ? (
+                        <img src={legacyData.frontImage || legacyData.backImage} alt="Custom Shirt" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                      ) : (
+                        <>
+                          <div style={{ position: 'absolute', inset: 0, backgroundColor: legacyData?.shirtColor || '#fff', WebkitMaskImage: 'url(/image copy 8.png)', WebkitMaskSize: 'contain', WebkitMaskPosition: 'center', WebkitMaskRepeat: 'no-repeat', maskImage: 'url(/image copy 8.png)', maskSize: 'contain', maskPosition: 'center', maskRepeat: 'no-repeat' }}></div>
+                          <img src="/image copy 8.png" alt="Custom Shirt" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+                        </>
+                      )}
+                    </div>
                     <div>
                       <h4 style={{ margin: '0 0 0.5rem 0' }}>Custom T-Shirt Design</h4>
                       <p style={{ margin: '0 0 0.25rem 0', color: '#666' }}>Size: {sizeString}</p>

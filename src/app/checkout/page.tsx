@@ -15,7 +15,7 @@ const STEPS = ['Summary', 'Instructions', 'Shipping', 'Payment'];
 export default function CheckoutPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const [data, setData] = useState<any>(null); // State for instructions, shipping, etc.
-  const { items } = useCart();
+  const { items, clearCart } = useCart();
   const router = useRouter();
 
   useEffect(() => {
@@ -38,13 +38,22 @@ export default function CheckoutPage() {
       let step = parseInt(storedStep, 10) || 0;
       if (step >= 3 && (!parsedData || !parsedData.shippingDetails)) step = 2;
       if (step >= 2 && (!parsedData || typeof parsedData.instructions === 'undefined')) step = 1;
-      if (step >= 1 && items.length === 0 && !parsedData?.frontImage) step = 0; // Guard for empty cart
+      if (step >= 1 && items.length === 0 && !parsedData?.frontImage && step !== 4) step = 0; // Guard for empty cart
       setCurrentStep(step);
     }
   }, [items.length]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // If order is completed, clear all carts and session data
+    if (currentStep === 4) {
+      clearCart();
+      sessionStorage.removeItem('checkoutState');
+      sessionStorage.removeItem('checkoutStep');
+      localStorage.removeItem('customDesignData');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep]);
 
   const handleNext = (updatedData?: any) => {
@@ -67,8 +76,12 @@ export default function CheckoutPage() {
   };
 
   const renderStep = () => {
+    const customQty = data?.quantities 
+      ? Object.values(data.quantities).reduce((a: any, b: any) => a + (parseInt(b as string) || 0), 0)
+      : 0;
+
     // If the cart is empty AND there is no custom design in session storage, block checkout
-    if (items.length === 0 && !data?.frontImage && !data?.backImage && !data?.leftImage && !data?.rightImage && currentStep < 4) {
+    if (items.length === 0 && !data?.frontImage && !data?.backImage && !data?.leftImage && !data?.rightImage && !customQty && currentStep < 4) {
       return (
         <div style={{ textAlign: 'center', padding: '4rem' }}>
           <h2>Your cart is empty.</h2>
@@ -92,7 +105,7 @@ export default function CheckoutPage() {
 
     switch (currentStep) {
       case 0:
-        return <SummaryStep data={combinedData} onNext={() => handleNext()} />;
+        return <SummaryStep data={combinedData} onNext={(updatedData) => handleNext(updatedData)} />;
       case 1:
         return <InstructionsStep data={combinedData} onNext={(updatedData) => handleNext(updatedData)} />;
       case 2:

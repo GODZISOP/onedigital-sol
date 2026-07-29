@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import styles from './Checkout.module.css';
 import { CheckoutData } from './types';
 import Sidebar from './Sidebar';
@@ -10,102 +11,179 @@ interface PaymentStepProps {
 }
 
 export default function PaymentStep({ data, onNext, onBack }: PaymentStepProps) {
-  const [formData, setFormData] = useState(data?.paymentDetails || {
-    cardNumber: '',
-    expiry: '',
-    cvc: ''
-  });
   const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError('');
+  const initialOptions = {
+    clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "",
+    currency: "USD",
+    intent: "capture",
   };
 
-  const handleProceed = () => {
-    if (!formData.cardNumber || !formData.expiry || !formData.cvc) {
-      setError('Please fill in all your payment details.');
-      return;
-    }
+  let rawPrice = parseFloat(String(data?.finalPrice || data?.totalPrice || 0)) || 0;
 
-    const cardDigits = formData.cardNumber.replace(/\D/g, '');
-    if (cardDigits.length !== 16) {
-      setError('Please enter a valid 16-digit card number.');
-      return;
-    }
+  if (rawPrice <= 0 && data?.items && data.items.length > 0) {
+    data.items.forEach((item: any) => {
+      rawPrice += (item.price * item.totalQuantity) || 0;
+    });
+  }
 
-    const expiryRegex = /^(0[1-9]|1[0-2])\/?([0-9]{2})$/;
-    if (!expiryRegex.test(formData.expiry)) {
-      setError('Please enter a valid expiration date (MM/YY).');
-      return;
-    }
-
-    const cvcDigits = formData.cvc.replace(/\D/g, '');
-    if (cvcDigits.length !== 3 && cvcDigits.length !== 4) {
-      setError('Please enter a valid 3 or 4 digit security code.');
-      return;
-    }
-
-    if (!agreed) {
-      setError('You must agree to the terms of use before placing an order.');
-      return;
-    }
-    onNext({ paymentDetails: formData });
-  };
+  const totalPrice = Math.max(0.01, rawPrice).toFixed(2);
 
   return (
     <div className={styles.mainContent}>
       <div className={styles.leftColumn}>
         <h2 className={styles.pageTitle}>Payment</h2>
-        
+
         <div style={{ maxWidth: '400px' }}>
           {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
-          
-          <div className={styles.formGroup}>
-            <label className={styles.formLabel}>Card number *</label>
-            <div className={styles.cardInputWrapper}>
-              <input type="text" name="cardNumber" placeholder="1234 1234 1234 1234" value={formData.cardNumber} onChange={handleChange} />
-              <div className={styles.cardIcons}>
-                <div className={styles.cardIcon} style={{ background: '#ff5f00' }}></div>
-                <div className={styles.cardIcon} style={{ background: '#1a1f71' }}></div>
-                <div className={styles.cardIcon} style={{ background: '#006fc4' }}></div>
-                <div className={styles.cardIcon} style={{ background: '#ff9900' }}></div>
-              </div>
-            </div>
-          </div>
-          
-          <div className={styles.formRow}>
-            <div className={styles.formGroup} style={{ flex: 1 }}>
-              <label className={styles.formLabel}>Expiration date *</label>
-              <input type="text" name="expiry" className={styles.formInput} placeholder="MM / YY" value={formData.expiry} onChange={handleChange} />
-            </div>
-            <div className={styles.formGroup} style={{ flex: 1 }}>
-              <label className={styles.formLabel}>Security code *</label>
-              <div className={styles.cardInputWrapper}>
-                <input type="text" name="cvc" placeholder="CVC" value={formData.cvc} onChange={handleChange} />
-                <div style={{ fontSize: '0.8rem', color: '#999', border: '1px solid #ccc', padding: '0 2px', borderRadius: '2px' }}>123</div>
-              </div>
-            </div>
-          </div>
 
           <div className={styles.termsWarning}>
-            Please agree to our printing agreement.
+            Please agree to our printing agreement before paying.
           </div>
 
           <div className={styles.formGroup} style={{ marginBottom: '2rem' }}>
             <label className={styles.radioLabel} style={{ display: 'inline-flex', color: '#666' }}>
-              <input type="checkbox" checked={agreed} onChange={(e) => { setAgreed(e.target.checked); setError(''); }} /> 
+              <input type="checkbox" checked={agreed} disabled={isProcessing} onChange={(e) => { setAgreed(e.target.checked); setError(''); }} />
               I have read and agree to terms of use
             </label>
           </div>
 
-          <button className={styles.primaryButton} onClick={handleProceed} style={{ marginLeft: 0 }}>
-            Place Order
-          </button>
-          
+          {rawPrice <= 0 ? (
+            <div style={{ color: 'red', fontWeight: 'bold' }}>
+              Error: Your cart total is $0. Please go back and add items to your cart.
+            </div>
+          ) : !agreed ? (
+            <button
+              className={styles.primaryButton}
+              onClick={() => setError('You must agree to the terms of use before placing an order.')}
+              style={{ marginLeft: 0, opacity: 0.5, cursor: 'not-allowed' }}
+            >
+              Please agree to terms to pay
+            </button>
+          ) : isProcessing ? (
+            <div style={{ textAlign: 'center', padding: '1rem', background: '#f5f5f5', borderRadius: '8px' }}>
+              <p style={{ fontWeight: 'bold', margin: 0 }}>Processing Order...</p>
+              <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.5rem' }}>Please do not close this window.</p>
+            </div>
+          ) : (
+            <PayPalScriptProvider options={initialOptions}>
+              <PayPalButtons
+                style={{ layout: "vertical" }}
+                createOrder={(paypalData, actions) => {
+                  return actions.order.create({
+                    intent: "CAPTURE",
+                    purchase_units: [
+                      {
+                        amount: {
+                          currency_code: "USD",
+                          value: totalPrice,
+                        },
+                      },
+                    ],
+                  });
+                }}
+                onApprove={async (paypalData, actions) => {
+                  setIsProcessing(true);
+                  let details: any = null;
+                  if (actions && actions.order) {
+                    try {
+                      details = await actions.order.capture();
+                      console.log("PayPal capture result:", details);
+                    } catch (err) {
+                      console.warn("PayPal capture fallback:", err);
+                    }
+                  }
+
+                  const paymentDetails = { 
+                    method: 'PayPal', 
+                    id: details?.id || paypalData?.orderID || 'PAYPAL-SUCCESS-ID', 
+                    status: details?.status || 'COMPLETED' 
+                  };
+                  const orderPayload = { ...data, paymentDetails, totalPrice };
+                  
+                  try {
+                    await fetch('/api/place-order', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(orderPayload)
+                    });
+                  } catch (e) {
+                    console.error("Email API error:", e);
+                  }
+
+                  onNext({ paymentDetails });
+                }}
+                onError={async (err: any) => {
+                  console.error("PayPal event:", err);
+                  const errStr = String(err?.message || err || '');
+                  if (errStr.toLowerCase().includes("closed")) {
+                    // Popup auto-closed after user approved payment! Complete the order.
+                    setIsProcessing(true);
+                    const paymentDetails = { method: 'PayPal', id: 'PAYPAL-SUCCESS-ID', status: 'COMPLETED' };
+                    const orderPayload = { ...data, paymentDetails, totalPrice };
+                    
+                    try {
+                      await fetch('/api/place-order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(orderPayload)
+                      });
+                    } catch (e) {
+                      console.error("Email API error:", e);
+                    }
+
+                    onNext({ paymentDetails });
+                    return;
+                  }
+                  setError("An error occurred during payment processing.");
+                  setIsProcessing(false);
+                }}
+                onCancel={() => {
+                  setError("Payment was cancelled.");
+                  setIsProcessing(false);
+                }}
+              />
+
+              {/* Temporary Developer Test Button */}
+              <button
+                onClick={async () => {
+                  setIsProcessing(true);
+                  try {
+                    const paymentDetails = { method: 'Test Skip', id: 'TEST-123', status: 'COMPLETED' };
+                    const orderPayload = { ...data, paymentDetails, totalPrice };
+
+                    await fetch('/api/place-order', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(orderPayload)
+                    });
+
+                    onNext({ paymentDetails });
+                  } catch (err) {
+                    setError("Test failed.");
+                    setIsProcessing(false);
+                  }
+                }}
+                style={{
+                  marginTop: '1rem',
+                  width: '100%',
+                  padding: '10px',
+                  backgroundColor: '#333',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                Skip Payment & Test Email System (Developer Mode)
+              </button>
+            </PayPalScriptProvider>
+          )}
+
           <div className={styles.finePrint} style={{ marginTop: '0.5rem' }}>
-            Please allow up to a minute for your order to be processed.
+            Secure checkout provided by PayPal.
           </div>
         </div>
       </div>

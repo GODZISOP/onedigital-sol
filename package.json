@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@iconify-json/game-icons": "^1.2.4",
+    "@paypal/react-paypal-js": "^10.2.1",
     "@tabler/icons": "^3.45.0",
     "@types/aos": "^3.0.8",
     "@types/fabric": "^5.3.11",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@types/node": "^20",
+    "@types/nodemailer": "^8.0.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
