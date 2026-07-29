@@ -72,8 +72,7 @@ export default function ContactPage() {
             <Phone className={styles.icon} size={24} />
             <div className={styles.itemText}>
               <strong>Phone</strong>
-              <span>(910) 865-1070</span>
-              <span className={styles.subText}>(Ask for Amber or Brian)</span>
+              <span>+1 910-865-1070</span>
             </div>
           </div>
 

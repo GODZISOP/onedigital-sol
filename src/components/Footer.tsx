@@ -36,11 +36,10 @@ export default function Footer() {
 
         <div className={styles.column}>
           <h3 className={styles.colTitle}>CONTACT</h3>
-          <div className={styles.contactItem} style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+          <div className={styles.contactItem}>
             <a href="tel:+19108651070" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'inherit', textDecoration: 'none' }}>
               <Phone size={16} /> +1 910-865-1070
             </a>
-            <span style={{ fontSize: '0.85rem', color: '#666', marginLeft: '1.5rem', marginTop: '0.2rem' }}>(Ask for Amber or Brian)</span>
           </div>
           <div className={styles.contactItem}>
             <a href="mailto:eastcoastdesignsnc@gmail.com" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'inherit', textDecoration: 'none' }}>
