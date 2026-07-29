@@ -52,7 +52,7 @@ export async function POST(req: Request) {
       backImage || 
       leftImage || 
       rightImage || 
-      (quantities && Object.values(quantities).reduce((a: any, b: any) => a + (parseInt(b as string) || 0), 0) > 0)
+      (quantities && Object.values(quantities as Record<string, any>).reduce((a: any, b: any) => a + (parseInt(b as string) || 0), 0) > 0)
     );
     const amountPaid = finalPrice || totalPrice || 0;
 
@@ -175,7 +175,7 @@ export async function POST(req: Request) {
     }
 
     if (hasCustomDesign) {
-      const customQty = Object.entries(quantities || {}).map(([s, q]) => `${s}: ${q}`).join(', ');
+      const customQty = Object.entries((quantities as Record<string, any>) || {}).map(([s, q]) => `${s}: ${q}`).join(', ');
       
       adminHtml += `
         <h3 style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 20px;">Custom Design Details</h3>
@@ -232,7 +232,7 @@ export async function POST(req: Request) {
     }
 
     if (hasCustomDesign) {
-      const customQty = Object.entries(quantities || {}).map(([s, q]) => `${s}: ${q}`).join(', ');
+      const customQty = Object.entries((quantities as Record<string, any>) || {}).map(([s, q]) => `${s}: ${q}`).join(', ');
       
       customerHtml += `
         <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; text-align: left;">
