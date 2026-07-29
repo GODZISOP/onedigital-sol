@@ -81,7 +81,7 @@ export default function ContactPage() {
             <Mail className={styles.icon} size={24} />
             <div className={styles.itemText}>
               <strong>Email</strong>
-              <span>appointmentstudio@gmail.com</span>
+              <span>eastcoastdesignsnc@gmail.com</span>
               <span className={styles.subText}>For custom orders and inquiries</span>
             </div>
           </div>
