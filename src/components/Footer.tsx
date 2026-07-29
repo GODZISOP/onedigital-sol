@@ -15,40 +15,42 @@ export default function Footer() {
         
         <div className={styles.column}>
           <h3 className={styles.colTitle}>LINKS</h3>
-          <Link href="/account" className={styles.link}>My Account</Link>
           <Link href="/design" className={styles.link}>Start Designing</Link>
-          <Link href="/cart" className={styles.link}>Cart</Link>
+          <Link href="/products" className={styles.link}>Product Catalog</Link>
+          <Link href="/checkout" className={styles.link}>Checkout</Link>
         </div>
 
         <div className={styles.column}>
           <h3 className={styles.colTitle}>PRODUCTS</h3>
           <Link href="/products" className={styles.link}>All Products</Link>
-          <Link href="/t-shirts" className={styles.link}>T-Shirts</Link>
-          <Link href="/hoodies" className={styles.link}>Hoodies</Link>
-          <Link href="/sweaters" className={styles.link}>Sweaters</Link>
+          <Link href="/products" className={styles.link}>Custom T-Shirts</Link>
+          <Link href="/products" className={styles.link}>Hoodies & Sweaters</Link>
+          <Link href="/products" className={styles.link}>Hats & Caps</Link>
         </div>
 
         <div className={styles.column}>
           <h3 className={styles.colTitle}>INFORMATION</h3>
-          <Link href="/about" className={styles.link}>About</Link>
-          <Link href="/faq" className={styles.link}>FAQ's</Link>
-          <Link href="/shipping" className={styles.link}>Shipping & Return</Link>
-          <Link href="/contact" className={styles.link}>Contact</Link>
+          <Link href="/about" className={styles.link}>About Us</Link>
+          <Link href="/contact" className={styles.link}>Contact Us</Link>
         </div>
 
         <div className={styles.column}>
           <h3 className={styles.colTitle}>CONTACT</h3>
           <div className={styles.contactItem} style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <a href="tel:+19108651070" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'inherit', textDecoration: 'none' }}>
               <Phone size={16} /> +1 910-865-1070
-            </div>
+            </a>
             <span style={{ fontSize: '0.85rem', color: '#666', marginLeft: '1.5rem', marginTop: '0.2rem' }}>(Ask for Amber or Brian)</span>
           </div>
           <div className={styles.contactItem}>
-            <Mail size={16} /> eastcoastdesignsnc@gmail.com
+            <a href="mailto:eastcoastdesignsnc@gmail.com" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'inherit', textDecoration: 'none' }}>
+              <Mail size={16} /> eastcoastdesignsnc@gmail.com
+            </a>
           </div>
           <div className={styles.contactItem}>
-            <MapPin size={16} /> 781 Tobermory Rd, Fayetteville, NC 28306
+            <a href="https://www.google.com/maps/search/?api=1&query=781+Tobermory+Rd,+Fayetteville,+NC+28306" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'inherit', textDecoration: 'none' }}>
+              <MapPin size={16} /> 781 Tobermory Rd, Fayetteville, NC 28306
+            </a>
           </div>
           <div className={styles.contactItem}>
             <Calendar size={16} /> Mon - Thurs 9AM - 5 PM
