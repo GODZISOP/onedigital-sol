@@ -48,12 +48,10 @@ export default function Header() {
               <Link href="https://www.carolinamade.com/cgi-bin/live/wam_tmpl/marketing.p?site=CMD&layout=Base_b2b&page=homepage" target="_blank" rel="noopener noreferrer" className={styles.dropdownItem}>Carolina Made</Link>
               <Link href="https://shop.champrosports.com/" target="_blank" rel="noopener noreferrer" className={styles.dropdownItem}>Champro Sports</Link>
               <Link href="https://www.companycasuals.com/eastcoastdesigns/start.jsp" target="_blank" rel="noopener noreferrer" className={styles.dropdownItem}>Company Casuals</Link>
-              <Link href="https://www.marcoawardsgroup.com/" target="_blank" rel="noopener noreferrer" className={styles.dropdownItem}>Discount Trophy</Link>
-              <Link href="https://www.high5sportswear.com/webapp/wcs/stores/servlet/StoreCatalogDisplayView?storeId=39551&catalogId=11051" target="_blank" rel="noopener noreferrer" className={styles.dropdownItem}>High5 Sportswear</Link>
               <Link href="https://www.momentecbrands.com/pacific-headwear" target="_blank" rel="noopener noreferrer" className={styles.dropdownItem}>Pacific Headwear</Link>
               <Link href="http://lostredirect.dnsmadeeasy.com/lostredirect.html" target="_blank" rel="noopener noreferrer" className={styles.dropdownItem}>Richardson Caps</Link>
-              <Link href="https://www.fsgdal.com/lander" target="_blank" rel="noopener noreferrer" className={styles.dropdownItem}>Teamwork Apparel</Link>
               <Link href="https://dealer.rothco.com/EastCoastDesigns/2018" target="_blank" rel="noopener noreferrer" className={styles.dropdownItem}>Rothco</Link>
+              <Link href="https://zappedheadwear.com/" target="_blank" rel="noopener noreferrer" className={styles.dropdownItem}>Zapped Hats</Link>
             </div>
           </div>
           <Link href="/about" className={styles.navItem}>About</Link>

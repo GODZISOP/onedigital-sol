@@ -81,6 +81,16 @@ export default function DesignPage() {
     if (savedColor) {
       setShirtColor(savedColor);
     }
+    const storedView = sessionStorage.getItem('designerCurrentView');
+    if (storedView) {
+      setCurrentView(storedView as ViewType);
+    }
+    const storedStates = sessionStorage.getItem('designerCanvasStates');
+    if (storedStates) {
+      try {
+        setCanvasStates(JSON.parse(storedStates));
+      } catch (e) {}
+    }
     setIsLoaded(true);
   }, []);
 
@@ -121,31 +131,24 @@ export default function DesignPage() {
   const [clipartColor, setClipartColor] = useState('#000000');
   const [clipartCategoryFilter, setClipartCategoryFilter] = useState('All');
 
-  const [currentView, setCurrentView] = useState<ViewType>(() => {
-    if (typeof window !== 'undefined') {
-      const stored = sessionStorage.getItem('designerCurrentView');
-      if (stored) return stored as ViewType;
-    }
-    return 'front';
-  });
+  const [currentView, setCurrentView] = useState<ViewType>('front');
 
   useEffect(() => {
     if (isLoaded) {
       sessionStorage.setItem('designerCurrentView', currentView);
     }
   }, [currentView, isLoaded]);
-  const [canvasStates, setCanvasStates] = useState<Record<ViewType, any>>(() => {
-    if (typeof window !== 'undefined') {
-      const stored = sessionStorage.getItem('designerCanvasStates');
-      if (stored) return JSON.parse(stored);
-    }
-    return { front: null, back: null, right: null, left: null };
-  });
+
+  const [canvasStates, setCanvasStates] = useState<Record<ViewType, any>>({ front: null, back: null, right: null, left: null });
 
   // Keep sessionStorage in sync whenever canvasStates changes
   useEffect(() => {
     if (isLoaded) {
-      sessionStorage.setItem('designerCanvasStates', JSON.stringify(canvasStates));
+      try {
+        sessionStorage.setItem('designerCanvasStates', JSON.stringify(canvasStates));
+      } catch (e) {
+        console.warn('Could not save canvas states, storage limit may be exceeded', e);
+      }
     }
   }, [canvasStates, isLoaded]);
 
@@ -158,34 +161,29 @@ export default function DesignPage() {
 
     const analyzeCanvas = (canvasObjects: any[], view: ViewType) => {
       if (!canvasObjects || canvasObjects.length === 0) return 0;
-      let hasUpload = false;
-      let hasText = false;
-      let hasClipart = false;
+      let total = 0;
 
       canvasObjects.forEach(obj => {
-        if (obj.sourceType === 'upload') hasUpload = true;
-        else if (obj.sourceType === 'clipart') hasClipart = true;
-        else if (obj.sourceType === 'text') hasText = true;
-        else if (obj.type === 'i-text' || obj.type === 'text') hasText = true;
-        else hasClipart = true; 
+        const isUpload = obj.sourceType === 'upload';
+        const isText = obj.sourceType === 'text' || obj.type === 'i-text' || obj.type === 'text';
+        const isClipart = obj.sourceType === 'clipart' || (!isUpload && !isText);
+
+        if (view === 'front') {
+          if (isUpload) total += 6.02;
+          else if (isText) total += 5.02;
+          else if (isClipart) total += 5.02;
+        } else if (view === 'back') {
+          if (isUpload) total += 7.02;
+          else if (isText) total += 6.02;
+          else if (isClipart) total += 6.02;
+        } else {
+          // Sleeves (Left/Right)
+          if (isUpload) total += 1.50;
+          else if (isText) total += 1.50;
+          else if (isClipart) total += 1.50;
+        }
       });
 
-      let total = 0;
-      if (view === 'front') {
-        if (hasUpload) total += 6.02;
-        if (hasText) total += 5.02;
-        if (hasClipart) total += 5.02;
-      } else if (view === 'back') {
-        if (hasUpload) total += 7.02;
-        if (hasText) total += 6.02;
-        if (hasClipart) total += 6.02;
-      } else {
-        // Sleeves (Left/Right)
-        if (hasUpload) total += 1.50;
-        if (hasText) total += 1.50;
-        if (hasClipart) total += 1.50;
-      }
-      
       return total;
     };
 
@@ -277,12 +275,18 @@ export default function DesignPage() {
             else setClipartColor(firstPath.get('stroke') as string);
           }
         }
+      } else if (obj.type === 'image' || obj.sourceType === 'upload') {
+        setActiveTab('image');
       }
     };
 
     const saveCanvasState = () => {
-      const json = canvas.toJSON(['sourceType']);
-      sessionStorage.setItem('designerCanvasData', JSON.stringify(json));
+      try {
+        const json = canvas.toJSON(['sourceType']);
+        sessionStorage.setItem('designerCanvasData', JSON.stringify(json));
+      } catch (e) {
+        console.warn('Could not save canvas data, storage limit may be exceeded', e);
+      }
       setRenderTrigger(prev => prev + 1); // Force re-render to update pricing
     };
 
@@ -580,13 +584,6 @@ export default function DesignPage() {
       img.src = shirtImageSrc;
       
       img.onload = () => {
-        // Step 1: Draw the solid color
-        ctx.fillStyle = shirtColor;
-        ctx.fillRect(0, 0, 500, 600);
-        
-        // Step 2: Mask it with the shirt shape
-        ctx.globalCompositeOperation = 'destination-in';
-        // Calculate centered image dimensions (object-fit: contain equivalent)
         const scale = Math.min(500 / img.width, 600 / img.height);
         const w = img.width * scale;
         const h = img.height * scale;
@@ -595,11 +592,13 @@ export default function DesignPage() {
         
         ctx.drawImage(img, x, y, w, h);
         
-        // Step 3: Multiply the shirt texture (shadows) over the masked color
+        ctx.globalCompositeOperation = 'source-in';
+        ctx.fillStyle = shirtColor;
+        ctx.fillRect(0, 0, 500, 600);
+        
         ctx.globalCompositeOperation = 'multiply';
         ctx.drawImage(img, x, y, w, h);
         
-        // Step 4: Draw the user design (fabric canvas) on top
         ctx.globalCompositeOperation = 'source-over';
         if (canvas) {
           const designImg = new window.Image();
@@ -637,17 +636,21 @@ export default function DesignPage() {
          else img.src = '/image copy 2.png';
          
          img.onload = () => {
-           ctx.fillStyle = shirtColor;
-           ctx.fillRect(0, 0, 500, 600);
-           ctx.globalCompositeOperation = 'destination-in';
            const scale = Math.min(500 / img.width, 600 / img.height);
            const w = img.width * scale;
            const h = img.height * scale;
            const x = (500 - w) / 2;
            const y = (600 - h) / 2;
+           
            ctx.drawImage(img, x, y, w, h);
+           
+           ctx.globalCompositeOperation = 'source-in';
+           ctx.fillStyle = shirtColor;
+           ctx.fillRect(0, 0, 500, 600);
+           
            ctx.globalCompositeOperation = 'multiply';
            ctx.drawImage(img, x, y, w, h);
+           
            ctx.globalCompositeOperation = 'source-over';
            if (designDataUrl) {
              const designImg = new window.Image();
@@ -690,15 +693,9 @@ export default function DesignPage() {
       const viewsToDownload: ViewType[] = ['front', 'back', 'left', 'right'];
       
       for (const view of viewsToDownload) {
-        const state = view === currentView ? (canvas ? canvas.toJSON() : null) : canvasStates[view];
-        if (!state || !state.objects || state.objects.length === 0) continue; // Only download views with designs
+        const state = view === currentView ? (canvas ? canvas.toJSON(['sourceType']) : null) : canvasStates[view];
         
         const dataUrl = await new Promise<string>((resolve, reject) => {
-          const offscreenEl = document.createElement('canvas');
-          offscreenEl.width = 500;
-          offscreenEl.height = 600;
-          const staticCanvas = new fabric.StaticCanvas(offscreenEl);
-          
           const doComposite = (designDataUrl: string) => {
              const compositeCanvas = document.createElement('canvas');
              compositeCanvas.width = 500;
@@ -713,17 +710,21 @@ export default function DesignPage() {
              else img.src = '/image copy 2.png';
              
              img.onload = () => {
-               ctx.fillStyle = shirtColor;
-               ctx.fillRect(0, 0, 500, 600);
-               ctx.globalCompositeOperation = 'destination-in';
                const scale = Math.min(500 / img.width, 600 / img.height);
                const w = img.width * scale;
                const h = img.height * scale;
                const x = (500 - w) / 2;
                const y = (600 - h) / 2;
+               
                ctx.drawImage(img, x, y, w, h);
+               
+               ctx.globalCompositeOperation = 'source-in';
+               ctx.fillStyle = shirtColor;
+               ctx.fillRect(0, 0, 500, 600);
+               
                ctx.globalCompositeOperation = 'multiply';
                ctx.drawImage(img, x, y, w, h);
+               
                ctx.globalCompositeOperation = 'source-over';
                if (designDataUrl) {
                  const designImg = new window.Image();
@@ -739,10 +740,20 @@ export default function DesignPage() {
              img.onerror = reject;
           };
 
-          if (state) {
+          if (view === currentView && canvas) {
+            canvas.discardActiveObject();
+            canvas.requestRenderAll();
+            doComposite(canvas.toDataURL({ format: 'png', multiplier: 1 }));
+          } else if (state) {
+            const offscreenEl = document.createElement('canvas');
+            offscreenEl.width = 500;
+            offscreenEl.height = 600;
+            const staticCanvas = new fabric.StaticCanvas(offscreenEl);
             staticCanvas.loadFromJSON(state, () => {
               staticCanvas.renderAll();
-              doComposite(staticCanvas.toDataURL({ format: 'png', multiplier: 1 }));
+              setTimeout(() => {
+                doComposite(staticCanvas.toDataURL({ format: 'png', multiplier: 1 }));
+              }, 150);
             });
           } else {
             doComposite('');
@@ -885,14 +896,24 @@ export default function DesignPage() {
         existingState = JSON.parse(sessionStorage.getItem('checkoutState') || '{}');
       } catch (e) {}
       
-      const mergedState = { ...existingState, ...newCheckoutData };
-      sessionStorage.setItem('checkoutState', JSON.stringify(mergedState));
-      sessionStorage.setItem('checkoutStep', '0'); // Reset step to Summary
+      try {
+        const mergedState = { ...existingState, ...newCheckoutData };
+        sessionStorage.setItem('checkoutState', JSON.stringify(mergedState));
+        sessionStorage.setItem('checkoutStep', '0'); // Reset step to Summary
+      } catch (e) {
+        console.warn('Could not save checkout state', e);
+        // Fallback to avoid breaking navigation
+        sessionStorage.setItem('checkoutStep', '0');
+      }
 
       // Save the latest state for the current view to ensure it's not lost on back navigation
       if (canvas) {
-        const updatedStates = { ...canvasStates, [currentView]: canvas.toJSON(['sourceType']) };
-        sessionStorage.setItem('designerCanvasStates', JSON.stringify(updatedStates));
+        try {
+          const updatedStates = { ...canvasStates, [currentView]: canvas.toJSON(['sourceType']) };
+          sessionStorage.setItem('designerCanvasStates', JSON.stringify(updatedStates));
+        } catch (e) {
+          console.warn('Could not save canvas states', e);
+        }
       }
 
       router.push('/checkout');
@@ -1175,6 +1196,26 @@ export default function DesignPage() {
                 />
                 <button className={styles.actionBtn}>Select File to Upload</button>
               </div>
+
+              {activeObject && (
+                <div style={{ marginTop: '1rem' }}>
+                  <button 
+                    onClick={handleDeleteText}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      backgroundColor: '#dc3545',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    🗑️ Delete Selected Image
+                  </button>
+                </div>
+              )}
             </div>
           )}
           
