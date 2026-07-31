@@ -764,9 +764,11 @@ export default function DesignPage() {
           const link = document.createElement('a');
           link.download = `my-custom-shirt-${view}.png`;
           link.href = dataUrl;
+          document.body.appendChild(link);
           link.click();
+          document.body.removeChild(link);
           // Small delay to prevent browser blocking multiple downloads
-          await new Promise(r => setTimeout(r, 300));
+          await new Promise(r => setTimeout(r, 500));
         }
       }
     } catch (err) {
