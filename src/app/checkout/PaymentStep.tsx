@@ -116,28 +116,8 @@ export default function PaymentStep({ data, onNext, onBack }: PaymentStepProps) 
                   onNext({ paymentDetails });
                 }}
                 onError={async (err: any) => {
-                  console.error("PayPal event:", err);
-                  const errStr = String(err?.message || err || '');
-                  if (errStr.toLowerCase().includes("closed")) {
-                    // Popup auto-closed after user approved payment! Complete the order.
-                    setIsProcessing(true);
-                    const paymentDetails = { method: 'PayPal', id: 'PAYPAL-SUCCESS-ID', status: 'COMPLETED' };
-                    const orderPayload = { ...data, paymentDetails, totalPrice };
-                    
-                    try {
-                      await fetch('/api/place-order', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(orderPayload)
-                      });
-                    } catch (e) {
-                      console.error("Email API error:", e);
-                    }
-
-                    onNext({ paymentDetails });
-                    return;
-                  }
-                  setError("An error occurred during payment processing.");
+                  console.error("PayPal event error:", err);
+                  setError("Payment was not completed. Please try again.");
                   setIsProcessing(false);
                 }}
                 onCancel={() => {
@@ -146,39 +126,6 @@ export default function PaymentStep({ data, onNext, onBack }: PaymentStepProps) 
                 }}
               />
 
-              {/* Temporary Developer Test Button */}
-              <button
-                onClick={async () => {
-                  setIsProcessing(true);
-                  try {
-                    const paymentDetails = { method: 'Test Skip', id: 'TEST-123', status: 'COMPLETED' };
-                    const orderPayload = { ...data, paymentDetails, totalPrice };
-
-                    await fetch('/api/place-order', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify(orderPayload)
-                    });
-
-                    onNext({ paymentDetails });
-                  } catch (err) {
-                    setError("Test failed.");
-                    setIsProcessing(false);
-                  }
-                }}
-                style={{
-                  marginTop: '1rem',
-                  width: '100%',
-                  padding: '10px',
-                  backgroundColor: '#333',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
-              >
-                Skip Payment & Test Email System (Developer Mode)
-              </button>
             </PayPalScriptProvider>
           )}
 
