@@ -260,6 +260,19 @@ export async function POST(req: Request) {
       </div>
     `;
 
+    console.log("==========================================");
+    console.log("📦 NEW ORDER RECEIVED (CONSOLE LOG):");
+    console.log("Customer:", shippingDetails?.firstName, shippingDetails?.lastName, "(", shippingDetails?.email, ")");
+    console.log("Total Amount:", amountPaid);
+    console.log("Payment Details:", paymentDetails);
+    console.log("Items Count:", items?.length || 0);
+    console.log("==========================================");
+
+    if (process.env.SKIP_EMAIL === 'true') {
+      console.log("🚫 SKIP_EMAIL is set to true. Real email sending skipped.");
+      return NextResponse.json({ success: true, message: "Order logged to console (Emails skipped via SKIP_EMAIL)" });
+    }
+
     // Send Admin Email
     await transporter.sendMail({
       from: `"One Digital Solutions" <${emailUser}>`,

@@ -86,34 +86,37 @@ export default function PaymentStep({ data, onNext, onBack }: PaymentStepProps) 
                 }}
                 onApprove={async (paypalData, actions) => {
                   setIsProcessing(true);
-                  let details: any = null;
-                  if (actions && actions.order) {
-                    try {
-                      details = await actions.order.capture();
-                      console.log("PayPal capture result:", details);
-                    } catch (err) {
-                      console.warn("PayPal capture fallback:", err);
-                    }
-                  }
-
-                  const paymentDetails = { 
-                    method: 'PayPal', 
-                    id: details?.id || paypalData?.orderID || 'PAYPAL-SUCCESS-ID', 
-                    status: details?.status || 'COMPLETED' 
-                  };
-                  const orderPayload = { ...data, paymentDetails, totalPrice };
-                  
                   try {
+                    if (!actions || !actions.order) {
+                      throw new Error("PayPal order action unavailable");
+                    }
+
+                    const details = await actions.order.capture();
+                    console.log("PayPal capture result:", details);
+
+                    if (details.status !== 'COMPLETED') {
+                      throw new Error(`Payment not completed. Status: ${details.status}`);
+                    }
+
+                    const paymentDetails = { 
+                      method: 'PayPal', 
+                      id: details.id || paypalData?.orderID, 
+                      status: details.status 
+                    };
+                    const orderPayload = { ...data, paymentDetails, totalPrice };
+                    
                     await fetch('/api/place-order', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify(orderPayload)
                     });
-                  } catch (e) {
-                    console.error("Email API error:", e);
-                  }
 
-                  onNext({ paymentDetails });
+                    onNext({ paymentDetails });
+                  } catch (err: any) {
+                    console.error("PayPal capture error:", err);
+                    setError("Payment verification failed. Money was not charged.");
+                    setIsProcessing(false);
+                  }
                 }}
                 onError={async (err: any) => {
                   console.error("PayPal event error:", err);
