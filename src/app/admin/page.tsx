@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { 
   Plus, Edit, Trash2, Search, ArrowLeft, RefreshCw, Image as ImageIcon, 
-  Package, DollarSign, Tag, Layers, CheckCircle2, AlertCircle, X, Upload, Copy, Check, Terminal, ExternalLink, Star, Flame
+  Package, DollarSign, Tag, Layers, CheckCircle2, AlertCircle, X, Upload, Copy, Check, Terminal, ExternalLink, Star, Flame, Lock, Key, LogOut
 } from 'lucide-react';
 import { 
   fetchProducts, addProduct, updateProduct, deleteProduct, toggleFeaturedProduct, togglePopularProduct,
@@ -28,11 +28,13 @@ CREATE TABLE IF NOT EXISTS public.products (
   sizes TEXT[] DEFAULT ARRAY['S', 'M', 'L', 'XL'],
   is_featured BOOLEAN DEFAULT FALSE,
   is_popular BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW())
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW())
 );
 
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_popular BOOLEAN DEFAULT FALSE;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW());
 
 -- Grant full table & sequence permissions to anon/authenticated roles
 GRANT ALL ON TABLE public.products TO anon, authenticated, service_role;
@@ -43,6 +45,11 @@ ALTER TABLE public.products DISABLE ROW LEVEL SECURITY;
 `;
 
 export default function AdminPage() {
+  // Authentication State
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [passwordInput, setPasswordInput] = useState('');
+  const [authError, setAuthError] = useState('');
+
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [tableExists, setTableExists] = useState<boolean | null>(null);
@@ -72,8 +79,37 @@ export default function AdminPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    loadProducts();
+    // Check if already authenticated in sessionStorage
+    const savedAuth = typeof window !== 'undefined' ? localStorage.getItem('admin_authenticated') : null;
+    if (savedAuth === 'true') {
+      setIsAuthenticated(true);
+      loadProducts();
+    }
   }, []);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    const correctPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin123';
+    
+    if (passwordInput === correctPassword) {
+      setIsAuthenticated(true);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('admin_authenticated', 'true');
+      }
+      setAuthError('');
+      loadProducts();
+    } else {
+      setAuthError('Incorrect Password! Please try again.');
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('admin_authenticated');
+    }
+    setPasswordInput('');
+  };
 
   const loadProducts = async () => {
     setLoading(true);
@@ -282,6 +318,84 @@ export default function AdminPage() {
     }
   };
 
+  // LOGIN LOCK OVERLAY IF NOT AUTHENTICATED
+  if (!isAuthenticated) {
+    return (
+      <div className={styles.adminContainer} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div style={{
+          background: '#161b22',
+          border: '1px solid #30363d',
+          borderRadius: '16px',
+          padding: '2.5rem',
+          width: '100%',
+          maxWidth: '420px',
+          boxShadow: '0 20px 50px rgba(0,0,0,0.7)',
+          textAlign: 'center'
+        }}>
+          <div style={{
+            width: '64px',
+            height: '64px',
+            borderRadius: '50%',
+            background: 'rgba(211, 47, 47, 0.15)',
+            color: '#ff4b4b',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 1.25rem'
+          }}>
+            <Lock size={32} />
+          </div>
+
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f0f6fc', marginBottom: '0.4rem' }}>
+            Admin Security Lock
+          </h2>
+          <p style={{ color: '#8b949e', fontSize: '0.9rem', marginBottom: '1.75rem' }}>
+            Enter your secret Admin Password to access product dashboard.
+          </p>
+
+          {authError && (
+            <div style={{
+              background: 'rgba(218, 54, 51, 0.2)',
+              border: '1px solid #da3633',
+              color: '#f85149',
+              padding: '0.65rem',
+              borderRadius: '8px',
+              fontSize: '0.85rem',
+              marginBottom: '1.25rem',
+              fontWeight: 600
+            }}>
+              {authError}
+            </div>
+          )}
+
+          <form onSubmit={handleLogin}>
+            <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
+              <input 
+                type="password"
+                placeholder="Enter Admin Password..."
+                className={styles.formInput}
+                style={{ paddingLeft: '2.6rem' }}
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                autoFocus
+                required
+              />
+              <Key size={18} color="#8b949e" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+            </div>
+
+            <button type="submit" className={styles.primaryButton} style={{ width: '100%', justifyContent: 'center', padding: '0.85rem' }}>
+              Unlock Dashboard
+            </button>
+          </form>
+
+          <p style={{ marginTop: '1.5rem', fontSize: '0.78rem', color: '#6e7681' }}>
+            Default Password: <code style={{ color: '#58a6ff' }}>admin123</code>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   // Filtered Products
   const filteredProducts = products.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -385,6 +499,9 @@ export default function AdminPage() {
             </button>
             <button onClick={handleOpenAddModal} className={styles.primaryButton}>
               <Plus size={20} /> Add New Product
+            </button>
+            <button onClick={handleLogout} className={styles.secondaryButton} style={{ borderColor: '#da3633', color: '#f85149' }} title="Lock / Logout from Admin Dashboard">
+              <LogOut size={18} /> Lock
             </button>
           </div>
         </div>
