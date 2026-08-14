@@ -300,24 +300,6 @@ export default function AdminPage() {
     }
   };
 
-  // Seed Dummy Data to Supabase helper
-  const handleSeedDatabase = async () => {
-    if (!confirm('This will insert sample products into your Supabase database. Continue?')) return;
-    setLoading(true);
-    const res = await seedDummyProductsToSupabase();
-    if (res.success) {
-      showToast('success', `Successfully seeded ${res.count} products to Supabase!`);
-      setTableExists(true);
-      await loadProducts();
-    } else {
-      showToast('error', res.error || 'Failed to seed database');
-      if (res.error?.includes('Table Missing')) {
-        setShowSqlModal(true);
-      }
-      setLoading(false);
-    }
-  };
-
   // LOGIN LOCK OVERLAY IF NOT AUTHENTICATED
   if (!isAuthenticated) {
     return (
@@ -491,17 +473,8 @@ export default function AdminPage() {
             <Link href="/products" className={styles.secondaryButton}>
               <ArrowLeft size={18} /> View Store
             </Link>
-            <button onClick={() => setShowSqlModal(true)} className={styles.secondaryButton}>
-              <Terminal size={18} /> SQL Setup
-            </button>
-            <button onClick={handleSeedDatabase} className={styles.secondaryButton} title="Sync sample products to Supabase">
-              <RefreshCw size={18} /> Sync Sample Data
-            </button>
             <button onClick={handleOpenAddModal} className={styles.primaryButton}>
               <Plus size={20} /> Add New Product
-            </button>
-            <button onClick={handleLogout} className={styles.secondaryButton} style={{ borderColor: '#da3633', color: '#f85149' }} title="Lock / Logout from Admin Dashboard">
-              <LogOut size={18} /> Lock
             </button>
           </div>
         </div>
