@@ -1,27 +1,46 @@
 'use client';
 
-import React, { useState, use } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
-import { dummyProducts } from '@/data/products';
+import { fetchProductById, Product } from '@/lib/products';
 import styles from './Product.module.css';
 
 export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const unwrappedParams = use(params);
-  const product = dummyProducts.find(p => p.id.toString() === unwrappedParams.id);
+  const productId = unwrappedParams.id;
   
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
-  const [selectedSize, setSelectedSize] = useState<string>(product?.sizes[0] || 'M');
+  const [selectedSize, setSelectedSize] = useState<string>('M');
   const [addName, setAddName] = useState(false);
   const { addToCart } = useCart();
+
+  useEffect(() => {
+    async function load() {
+      setLoading(true);
+      const data = await fetchProductById(productId);
+      setProduct(data);
+      if (data && data.sizes && data.sizes.length > 0) {
+        setSelectedSize(data.sizes[0]);
+      }
+      setLoading(false);
+    }
+    load();
+  }, [productId]);
+
+  if (loading) {
+    return <div style={{ padding: '4rem', textAlign: 'center', fontSize: '1.2rem' }}>Loading product details...</div>;
+  }
 
   if (!product) {
     return notFound();
   }
 
-  const finalPrice = product.id === 3 && addName ? product.price + 4 : product.price;
+  const finalPrice = product.id.toString() === '3' && addName ? product.price + 4 : product.price;
 
   const handleAddToCart = () => {
     const sizesSelected = { [selectedSize]: quantity };
@@ -35,7 +54,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       image: product.image,
       checkoutData: {
         pricePerShirt: finalPrice,
-        shirtColor: 'White', // Default
+        shirtColor: 'White',
         quantities: sizesSelected as any,
         totalPrice: parseFloat((finalPrice * quantity).toFixed(2)),
         frontImage: product.image,
@@ -59,7 +78,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       </div>
       
       <div className={styles.productWrapper}>
-        <div className={styles.imageSection} style={{ overflow: 'hidden' }}>
+        <div className={styles.imageSection} style={{ overflow: 'hidden', position: 'relative', minHeight: '350px' }}>
           <Image 
             src={product.image} 
             alt={product.name} 
@@ -71,6 +90,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               transform: 'scale(1.3)',
               transformOrigin: 'center center'
             }}
+            unoptimized={product.image.startsWith('http') || product.image.startsWith('data:')}
             priority
           />
         </div>
@@ -90,7 +110,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
           
           <div style={{ marginBottom: '1.5rem' }}>
             <div style={{ fontWeight: 'bold', marginBottom: '0.5rem', fontSize: '0.9rem', color: '#333' }}>SELECT SIZE</div>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               {product.sizes.map(size => (
                 <button
                   key={size}

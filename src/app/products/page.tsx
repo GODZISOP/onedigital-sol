@@ -6,13 +6,25 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import styles from './Products.module.css';
 
+import { fetchProducts, Product } from '@/lib/products';
 import { dummyProducts } from '@/data/products';
 
 function ProductsContent() {
   const searchParams = useSearchParams();
   const initialSearch = searchParams.get('search') || '';
   
+  const [productsList, setProductsList] = useState<Product[]>(dummyProducts);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState(initialSearch);
+
+  useEffect(() => {
+    async function load() {
+      const data = await fetchProducts();
+      setProductsList(data);
+      setLoading(false);
+    }
+    load();
+  }, []);
   
   useEffect(() => {
     setSearchQuery(searchParams.get('search') || '');
@@ -37,19 +49,19 @@ function ProductsContent() {
     );
   };
 
-  const categories = useMemo(() => Array.from(new Set(dummyProducts.map(p => p.category))), []);
+  const categories = useMemo(() => Array.from(new Set(productsList.map(p => p.category))), [productsList]);
   const allSizes = useMemo(() => {
     const sizes = new Set<string>();
-    dummyProducts.forEach(p => p.sizes.forEach(s => sizes.add(s)));
+    productsList.forEach(p => p.sizes.forEach(s => sizes.add(s)));
     return Array.from(sizes).sort((a, b) => {
       const order = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
       return order.indexOf(a) - order.indexOf(b);
     });
-  }, []);
+  }, [productsList]);
 
   // Filter and sort logic
   const filteredProducts = useMemo(() => {
-    let result = [...dummyProducts];
+    let result = [...productsList];
 
     // Search filter
     if (searchQuery.trim() !== '') {
@@ -86,8 +98,7 @@ function ProductsContent() {
     }
 
     return result;
-  }, [searchQuery, selectedCategories, selectedSizes, minPrice, maxPrice, sortBy]);
-
+  }, [productsList, searchQuery, selectedCategories, selectedSizes, minPrice, maxPrice, sortBy]);
 
   return (
     <>
@@ -178,7 +189,9 @@ function ProductsContent() {
           </div>
 
           <div className={styles.productGrid}>
-            {filteredProducts.length > 0 ? (
+            {loading ? (
+              <div className={styles.noResults}>Loading products...</div>
+            ) : filteredProducts.length > 0 ? (
               filteredProducts.map(product => (
                 <Link href={`/product/${product.id}`} key={product.id} className={styles.productCard} style={{ textDecoration: 'none', color: 'inherit' }}>
                   <div className={styles.imageWrapper}>
@@ -187,6 +200,7 @@ function ProductsContent() {
                       alt={product.name} 
                       fill 
                       style={{ objectFit: 'contain', padding: '1rem' }} 
+                      unoptimized={product.image.startsWith('http') || product.image.startsWith('data:')}
                     />
                   </div>
                   <div className={styles.productInfo}>
