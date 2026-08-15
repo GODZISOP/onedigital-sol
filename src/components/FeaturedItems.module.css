@@ -31,7 +31,7 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
   width: 100%;
   max-width: 1200px;
@@ -42,6 +42,11 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.item:hover {
+  transform: translateY(-4px);
 }
 
 .imageWrapper {
@@ -50,6 +55,8 @@
   position: relative;
   margin-bottom: 1rem;
   background-color: #f4f4f4;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .itemImage {
@@ -68,7 +75,13 @@
   color: #333;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 576px) {
   .grid {
     grid-template-columns: 1fr;
   }
