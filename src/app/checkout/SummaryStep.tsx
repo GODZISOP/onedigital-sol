@@ -212,8 +212,8 @@ export default function SummaryStep({ data, onNext }: SummaryStepProps) {
                         <img src={legacyData.frontImage || legacyData.backImage} alt="Custom Shirt" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                       ) : (
                         <>
-                          <div style={{ position: 'absolute', inset: 0, backgroundColor: legacyData?.shirtColor || '#fff', WebkitMaskImage: 'url(/image copy 8.png)', WebkitMaskSize: 'contain', WebkitMaskPosition: 'center', WebkitMaskRepeat: 'no-repeat', maskImage: 'url(/image copy 8.png)', maskSize: 'contain', maskPosition: 'center', maskRepeat: 'no-repeat' }}></div>
-                          <img src="/image copy 8.png" alt="Custom Shirt" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+                          <div style={{ position: 'absolute', inset: 0, backgroundColor: legacyData?.shirtColor || '#fff', WebkitMaskImage: 'url(/templates/shirt-front.png)', WebkitMaskSize: 'contain', WebkitMaskPosition: 'center', WebkitMaskRepeat: 'no-repeat', maskImage: 'url(/templates/shirt-front.png)', maskSize: 'contain', maskPosition: 'center', maskRepeat: 'no-repeat' }}></div>
+                          <img src="/templates/shirt-front.png" alt="Custom Shirt" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
                         </>
                       )}
                     </div>
@@ -230,8 +230,8 @@ export default function SummaryStep({ data, onNext }: SummaryStepProps) {
                 <div>
                   <div className={styles.mockupLabel}>Front Design Preview</div>
                   <div style={{ position: 'relative', width: '100%', border: '1px solid #eee', background: '#fcfcfc', aspectRatio: '500/600', overflow: 'hidden' }}>
-                    <div style={{ position: 'absolute', inset: 0, backgroundColor: legacyData?.shirtColor || '#fff', WebkitMaskImage: "url('/image copy 8.png')", WebkitMaskSize: 'contain', WebkitMaskPosition: 'center', WebkitMaskRepeat: 'no-repeat', maskImage: "url('/image copy 8.png')", maskSize: 'contain', maskPosition: 'center', maskRepeat: 'no-repeat' }}></div>
-                    <img src="/image copy 8.png" alt="Front Mockup" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+                    <div style={{ position: 'absolute', inset: 0, backgroundColor: legacyData?.shirtColor || '#fff', WebkitMaskImage: "url('/templates/shirt-front.png')", WebkitMaskSize: 'contain', WebkitMaskPosition: 'center', WebkitMaskRepeat: 'no-repeat', maskImage: "url('/templates/shirt-front.png')", maskSize: 'contain', maskPosition: 'center', maskRepeat: 'no-repeat' }}></div>
+                    <img src="/templates/shirt-front.png" alt="Front Mockup" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
                     {legacyData?.frontImage && (
                       <img src={legacyData.frontImage} alt="Custom Front" style={{ position: 'absolute', inset: '0', width: '100%', height: '100%', objectFit: 'contain', zIndex: 2 }} />
                     )}
@@ -240,8 +240,8 @@ export default function SummaryStep({ data, onNext }: SummaryStepProps) {
                 <div>
                   <div className={styles.mockupLabel}>Back Design Preview</div>
                   <div style={{ position: 'relative', width: '100%', border: '1px solid #eee', background: '#fcfcfc', aspectRatio: '500/600', overflow: 'hidden' }}>
-                    <div style={{ position: 'absolute', inset: 0, backgroundColor: legacyData?.shirtColor || '#fff', WebkitMaskImage: "url('/image.png')", WebkitMaskSize: 'contain', WebkitMaskPosition: 'center', WebkitMaskRepeat: 'no-repeat', maskImage: "url('/image.png')", maskSize: 'contain', maskPosition: 'center', maskRepeat: 'no-repeat' }}></div>
-                    <img src="/image.png" alt="Back Mockup" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+                    <div style={{ position: 'absolute', inset: 0, backgroundColor: legacyData?.shirtColor || '#fff', WebkitMaskImage: "url('/templates/shirt-back.png')", WebkitMaskSize: 'contain', WebkitMaskPosition: 'center', WebkitMaskRepeat: 'no-repeat', maskImage: "url('/templates/shirt-back.png')", maskSize: 'contain', maskPosition: 'center', maskRepeat: 'no-repeat' }}></div>
+                    <img src="/templates/shirt-back.png" alt="Back Mockup" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
                     {legacyData?.backImage && (
                       <img src={legacyData.backImage} alt="Custom Back" style={{ position: 'absolute', inset: '0', width: '100%', height: '100%', objectFit: 'contain', zIndex: 2 }} />
                     )}
@@ -250,8 +250,8 @@ export default function SummaryStep({ data, onNext }: SummaryStepProps) {
                 <div>
                   <div className={styles.mockupLabel}>Left Sleeve Preview</div>
                   <div style={{ position: 'relative', width: '100%', border: '1px solid #eee', background: '#fcfcfc', aspectRatio: '500/600', overflow: 'hidden' }}>
-                    <div style={{ position: 'absolute', inset: 0, backgroundColor: legacyData?.shirtColor || '#fff', WebkitMaskImage: "url('/image copy.png')", WebkitMaskSize: 'contain', WebkitMaskPosition: 'center', WebkitMaskRepeat: 'no-repeat', maskImage: "url('/image copy.png')", maskSize: 'contain', maskPosition: 'center', maskRepeat: 'no-repeat' }}></div>
-                    <img src="/image copy.png" alt="Left Mockup" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+                    <div style={{ position: 'absolute', inset: 0, backgroundColor: legacyData?.shirtColor || '#fff', WebkitMaskImage: "url('/templates/shirt-left.png')", WebkitMaskSize: 'contain', WebkitMaskPosition: 'center', WebkitMaskRepeat: 'no-repeat', maskImage: "url('/templates/shirt-left.png')", maskSize: 'contain', maskPosition: 'center', maskRepeat: 'no-repeat' }}></div>
+                    <img src="/templates/shirt-left.png" alt="Left Mockup" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
                     {legacyData?.leftImage && (
                       <img src={legacyData.leftImage} alt="Custom Left" style={{ position: 'absolute', inset: '0', width: '100%', height: '100%', objectFit: 'contain', zIndex: 2 }} />
                     )}
@@ -260,8 +260,8 @@ export default function SummaryStep({ data, onNext }: SummaryStepProps) {
                 <div>
                   <div className={styles.mockupLabel}>Right Sleeve Preview</div>
                   <div style={{ position: 'relative', width: '100%', border: '1px solid #eee', background: '#fcfcfc', aspectRatio: '500/600', overflow: 'hidden' }}>
-                    <div style={{ position: 'absolute', inset: 0, backgroundColor: legacyData?.shirtColor || '#fff', WebkitMaskImage: "url('/image copy 2.png')", WebkitMaskSize: 'contain', WebkitMaskPosition: 'center', WebkitMaskRepeat: 'no-repeat', maskImage: "url('/image copy 2.png')", maskSize: 'contain', maskPosition: 'center', maskRepeat: 'no-repeat' }}></div>
-                    <img src="/image copy 2.png" alt="Right Mockup" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+                    <div style={{ position: 'absolute', inset: 0, backgroundColor: legacyData?.shirtColor || '#fff', WebkitMaskImage: "url('/templates/shirt-right.png')", WebkitMaskSize: 'contain', WebkitMaskPosition: 'center', WebkitMaskRepeat: 'no-repeat', maskImage: "url('/templates/shirt-right.png')", maskSize: 'contain', maskPosition: 'center', maskRepeat: 'no-repeat' }}></div>
+                    <img src="/templates/shirt-right.png" alt="Right Mockup" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
                     {legacyData?.rightImage && (
                       <img src={legacyData.rightImage} alt="Custom Right" style={{ position: 'absolute', inset: '0', width: '100%', height: '100%', objectFit: 'contain', zIndex: 2 }} />
                     )}

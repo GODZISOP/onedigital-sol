@@ -558,10 +558,10 @@ export default function DesignPage() {
 
   const getShirtImageSrc = () => {
     switch (currentView) {
-      case 'back': return '/image.png';
-      case 'left': return '/image copy.png';
-      case 'right': return '/image copy 2.png';
-      default: return '/image copy 8.png';
+      case 'back': return '/templates/shirt-back.png';
+      case 'left': return '/templates/shirt-left.png';
+      case 'right': return '/templates/shirt-right.png';
+      default: return '/templates/shirt-front.png';
     }
   };
   const shirtImageSrc = getShirtImageSrc();
@@ -630,10 +630,10 @@ export default function DesignPage() {
          
          const img = new window.Image();
          img.crossOrigin = 'Anonymous';
-         if (view === 'front') img.src = '/image copy 8.png';
-         else if (view === 'back') img.src = '/image.png';
-         else if (view === 'left') img.src = '/image copy.png';
-         else img.src = '/image copy 2.png';
+         if (view === 'front') img.src = '/templates/shirt-front.png';
+         else if (view === 'back') img.src = '/templates/shirt-back.png';
+         else if (view === 'left') img.src = '/templates/shirt-left.png';
+         else img.src = '/templates/shirt-right.png';
          
          img.onload = () => {
            const scale = Math.min(500 / img.width, 600 / img.height);
@@ -704,10 +704,10 @@ export default function DesignPage() {
              if (!ctx) return resolve('');
              
              const img = new window.Image();
-             if (view === 'front') img.src = '/image copy 8.png';
-             else if (view === 'back') img.src = '/image.png';
-             else if (view === 'left') img.src = '/image copy.png';
-             else img.src = '/image copy 2.png';
+             if (view === 'front') img.src = '/templates/shirt-front.png';
+             else if (view === 'back') img.src = '/templates/shirt-back.png';
+             else if (view === 'left') img.src = '/templates/shirt-left.png';
+             else img.src = '/templates/shirt-right.png';
              
              img.onload = () => {
                const scale = Math.min(500 / img.width, 600 / img.height);

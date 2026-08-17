@@ -1,4 +1,6 @@
 export const dummyProducts = [
+  // Test Item
+  { id: 99, name: 'TEST PRODUCT ($0.01)', category: 'Test', sizes: ['One Size'], price: 0.01, image: '/pc43_logo_shirt.png', description: 'Live payment test item with $0.01 USD price.' },
   // Featured Items (0 to 3)
   { id: 1, name: 'HOODED SWEATSHIRT', category: 'Hoodie', sizes: ['S', 'M', 'L', 'XL'], price: 30.00, image: '/hoodie_logo_image.png', description: 'A favorite in sweatshirt choices. Durable and high-quality fabric designed to withstand the elements while keeping you incredibly comfortable. The double-lined hood and spacious front pouch pocket ensure that your head and hands stay as warm as your body. Ribbed cuffs and waistband provide a secure, snug fit.' },
   { id: 2, name: 'PC43 T-SHIRT', category: 'T-Shirt', sizes: ['S', 'M', 'L', 'XL'], price: 15.00, image: '/pc43_logo_shirt.png', description: 'A classic comfortable cotton t-shirt for everyday wear. The Port & Company PC43 is a reliable choice for comfort, softness, and durability. Made from high-quality fabric, this shirt offers a relaxed fit that holds its shape wash after wash. Perfect for casual outings, team events, or just relaxing at home.' },

@@ -64,8 +64,8 @@ export default function Sidebar({ data }: SidebarProps) {
               <img src={data.frontImage} alt="Front View" style={{ width: '100%', objectFit: 'contain', border: '1px solid #eee', background: '#fcfcfc', borderRadius: '4px' }} />
             ) : (
               <div style={{ position: 'relative', width: '100%', border: '1px solid #eee', background: '#fcfcfc', overflow: 'hidden', aspectRatio: '500/600', borderRadius: '4px' }}>
-                <div style={{ position: 'absolute', inset: 0, backgroundColor: data.shirtColor || '#fff', WebkitMaskImage: 'url(/image copy 8.png)', WebkitMaskSize: 'contain', WebkitMaskPosition: 'center', WebkitMaskRepeat: 'no-repeat', maskImage: 'url(/image copy 8.png)', maskSize: 'contain', maskPosition: 'center', maskRepeat: 'no-repeat' }}></div>
-                <img src="/image copy 8.png" alt="Front Mockup" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+                <div style={{ position: 'absolute', inset: 0, backgroundColor: data.shirtColor || '#fff', WebkitMaskImage: 'url(/templates/shirt-front.png)', WebkitMaskSize: 'contain', WebkitMaskPosition: 'center', WebkitMaskRepeat: 'no-repeat', maskImage: 'url(/templates/shirt-front.png)', maskSize: 'contain', maskPosition: 'center', maskRepeat: 'no-repeat' }}></div>
+                <img src="/templates/shirt-front.png" alt="Front Mockup" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
               </div>
             )}
             
@@ -73,8 +73,8 @@ export default function Sidebar({ data }: SidebarProps) {
               <img src={data.backImage} alt="Back View" style={{ width: '100%', objectFit: 'contain', border: '1px solid #eee', background: '#fcfcfc', borderRadius: '4px' }} />
             ) : (
               <div style={{ position: 'relative', width: '100%', border: '1px solid #eee', background: '#fcfcfc', overflow: 'hidden', aspectRatio: '500/600', borderRadius: '4px' }}>
-                <div style={{ position: 'absolute', inset: 0, backgroundColor: data.shirtColor || '#fff', WebkitMaskImage: 'url(/image.png)', WebkitMaskSize: 'contain', WebkitMaskPosition: 'center', WebkitMaskRepeat: 'no-repeat', maskImage: 'url(/image.png)', maskSize: 'contain', maskPosition: 'center', maskRepeat: 'no-repeat' }}></div>
-                <img src="/image.png" alt="Back Mockup" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
+                <div style={{ position: 'absolute', inset: 0, backgroundColor: data.shirtColor || '#fff', WebkitMaskImage: 'url(/templates/shirt-back.png)', WebkitMaskSize: 'contain', WebkitMaskPosition: 'center', WebkitMaskRepeat: 'no-repeat', maskImage: 'url(/templates/shirt-back.png)', maskSize: 'contain', maskPosition: 'center', maskRepeat: 'no-repeat' }}></div>
+                <img src="/templates/shirt-back.png" alt="Back Mockup" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
               </div>
             )}
             

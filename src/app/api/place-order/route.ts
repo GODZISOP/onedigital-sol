@@ -127,7 +127,7 @@ export async function POST(req: Request) {
     } else if (hasCustomDesign) {
       attachments.push({
         filename: 'blank-front.png',
-        path: path.join(process.cwd(), 'public', 'image copy 8.png'),
+        path: path.join(process.cwd(), 'public', 'templates', 'shirt-front.png'),
         cid: 'frontDesign'
       });
     }
@@ -141,7 +141,7 @@ export async function POST(req: Request) {
     } else if (hasCustomDesign) {
       attachments.push({
         filename: 'blank-back.png',
-        path: path.join(process.cwd(), 'public', 'image.png'),
+        path: path.join(process.cwd(), 'public', 'templates', 'shirt-back.png'),
         cid: 'backDesign'
       });
     }
@@ -155,7 +155,7 @@ export async function POST(req: Request) {
     } else if (hasCustomDesign) {
       attachments.push({
         filename: 'blank-left.png',
-        path: path.join(process.cwd(), 'public', 'image copy.png'),
+        path: path.join(process.cwd(), 'public', 'templates', 'shirt-left.png'),
         cid: 'leftDesign'
       });
     }
@@ -169,7 +169,7 @@ export async function POST(req: Request) {
     } else if (hasCustomDesign) {
       attachments.push({
         filename: 'blank-right.png',
-        path: path.join(process.cwd(), 'public', 'image copy 2.png'),
+        path: path.join(process.cwd(), 'public', 'templates', 'shirt-right.png'),
         cid: 'rightDesign'
       });
     }
