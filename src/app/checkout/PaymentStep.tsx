@@ -10,13 +10,40 @@ interface PaymentStepProps {
   onBack?: () => void;
 }
 
+function formatPayPalError(err: any): string {
+  if (!err) return "Unknown error occurred";
+  if (typeof err === 'string') return err;
+  
+  // Check for PayPal specific details array
+  if (err?.data?.details && Array.isArray(err.data.details) && err.data.details.length > 0) {
+    const d = err.data.details[0];
+    return `${d.issue || ''}: ${d.description || ''}`.trim() || d.issue || err.message;
+  }
+  if (err?.details && Array.isArray(err.details) && err.details.length > 0) {
+    const d = err.details[0];
+    return `${d.issue || ''}: ${d.description || ''}`.trim() || d.issue || err.message;
+  }
+  
+  // Specific common PayPal messages
+  if (err?.name === "INSTRUMENT_DECLINED" || err?.message?.includes("INSTRUMENT_DECLINED")) {
+    return "Card or payment instrument was declined by PayPal / Bank.";
+  }
+  if (err?.message?.includes("TRANSACTION_REFUSED") || err?.message?.includes("UNPROCESSABLE_ENTITY")) {
+    return "Transaction refused by PayPal (Often caused when merchant tries to pay themselves or account has restrictions).";
+  }
+
+  return err.message || JSON.stringify(err);
+}
+
 export default function PaymentStep({ data, onNext, onBack }: PaymentStepProps) {
   const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
+  const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
+
   const initialOptions = {
-    clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "",
+    clientId: clientId,
     currency: "USD",
     intent: "capture",
   };
@@ -37,7 +64,35 @@ export default function PaymentStep({ data, onNext, onBack }: PaymentStepProps) 
         <h2 className={styles.pageTitle}>Payment</h2>
 
         <div style={{ maxWidth: '400px' }}>
-          {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
+          {error && (
+            <div style={{ 
+              color: '#b91c1c', 
+              background: '#fef2f2', 
+              border: '1px solid #f87171', 
+              padding: '12px 14px', 
+              borderRadius: '8px', 
+              marginBottom: '1.2rem',
+              fontSize: '0.9rem',
+              lineHeight: '1.4'
+            }}>
+              <strong>⚠️ Payment Error:</strong>
+              <div style={{ marginTop: '4px', wordBreak: 'break-word' }}>{error}</div>
+            </div>
+          )}
+
+          {!clientId && (
+            <div style={{ 
+              color: '#b45309', 
+              background: '#fffbeb', 
+              border: '1px solid #fcd34d', 
+              padding: '10px 12px', 
+              borderRadius: '6px', 
+              marginBottom: '1rem',
+              fontSize: '0.85rem'
+            }}>
+              ⚠️ <strong>Warning:</strong> PayPal Client ID is missing. Make sure <code>NEXT_PUBLIC_PAYPAL_CLIENT_ID</code> is configured.
+            </div>
+          )}
 
           <div className={styles.termsWarning}>
             Please agree to our printing agreement before paying.
@@ -86,6 +141,7 @@ export default function PaymentStep({ data, onNext, onBack }: PaymentStepProps) 
                 }}
                 onApprove={async (paypalData, actions) => {
                   setIsProcessing(true);
+                  setError('');
                   try {
                     if (!actions || !actions.order) {
                       throw new Error("PayPal order action unavailable");
@@ -105,25 +161,32 @@ export default function PaymentStep({ data, onNext, onBack }: PaymentStepProps) 
                     };
                     const orderPayload = { ...data, paymentDetails, totalPrice };
                     
-                    await fetch('/api/place-order', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify(orderPayload)
-                    });
+                    try {
+                      await fetch('/api/place-order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(orderPayload)
+                      });
+                    } catch (apiErr) {
+                      console.error("Order notification API error (payment already captured):", apiErr);
+                    }
 
                     onNext({ paymentDetails });
                   } catch (err: any) {
-                    console.error("PayPal capture error:", err);
-                    setError("Payment verification failed. Money was not charged.");
+                    console.error("PayPal capture error details:", err);
+                    const formatted = formatPayPalError(err);
+                    setError(`Payment verification failed: ${formatted}`);
                     setIsProcessing(false);
                   }
                 }}
                 onError={async (err: any) => {
-                  console.error("PayPal event error:", err);
-                  setError("Payment was not completed. Please try again.");
+                  console.error("PayPal event error details:", err);
+                  const formatted = formatPayPalError(err);
+                  setError(`PayPal Error: ${formatted}`);
                   setIsProcessing(false);
                 }}
-                onCancel={() => {
+                onCancel={(cancelData) => {
+                  console.log("PayPal payment cancelled:", cancelData);
                   setError("Payment was cancelled.");
                   setIsProcessing(false);
                 }}
@@ -142,3 +205,4 @@ export default function PaymentStep({ data, onNext, onBack }: PaymentStepProps) 
     </div>
   );
 }
+
