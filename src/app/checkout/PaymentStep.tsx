@@ -117,82 +117,124 @@ export default function PaymentStep({ data, onNext, onBack }: PaymentStepProps) 
             >
               Please agree to terms to pay
             </button>
-          ) : isProcessing ? (
-            <div style={{ textAlign: 'center', padding: '1rem', background: '#f5f5f5', borderRadius: '8px' }}>
-              <p style={{ fontWeight: 'bold', margin: 0 }}>Processing Order...</p>
-              <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.5rem' }}>Please do not close this window.</p>
-            </div>
           ) : (
-            <PayPalScriptProvider options={initialOptions}>
-              <PayPalButtons
-                style={{ layout: "vertical" }}
-                createOrder={(paypalData, actions) => {
-                  return actions.order.create({
-                    intent: "CAPTURE",
-                    purchase_units: [
-                      {
-                        amount: {
-                          currency_code: "USD",
-                          value: totalPrice,
-                        },
-                      },
-                    ],
-                  });
-                }}
-                onApprove={async (paypalData, actions) => {
-                  setIsProcessing(true);
-                  setError('');
-                  try {
-                    if (!actions || !actions.order) {
-                      throw new Error("PayPal order action unavailable");
-                    }
+            <>
+              {isProcessing && (
+                <div style={{ textAlign: 'center', padding: '1rem', background: '#f5f5f5', borderRadius: '8px', marginBottom: '1rem' }}>
+                  <p style={{ fontWeight: 'bold', margin: 0 }}>Processing Order...</p>
+                  <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.5rem' }}>Please do not close this window.</p>
+                </div>
+              )}
+              <div style={{ display: isProcessing ? 'none' : 'block' }}>
+                <PayPalScriptProvider options={initialOptions}>
+                  <PayPalButtons
+                    style={{ layout: "vertical" }}
+                    createOrder={(paypalData, actions) => {
+                      const payload: any = {
+                        intent: "CAPTURE",
+                        purchase_units: [
+                          {
+                            amount: {
+                              currency_code: "USD",
+                              value: totalPrice,
+                            },
+                          },
+                        ],
+                      };
 
-                    const details = await actions.order.capture();
-                    console.log("PayPal capture result:", details);
+                      if (data?.shippingDetails) {
+                        const { firstName, lastName, email, address1, address2, city, state, zip } = data.shippingDetails;
+                        
+                        if (firstName || lastName) {
+                          payload.payer = {
+                            name: {
+                              given_name: firstName || "",
+                              surname: lastName || "",
+                            }
+                          };
+                          if (email) {
+                            payload.payer.email_address = email;
+                          }
+                        }
 
-                    if (details.status !== 'COMPLETED') {
-                      throw new Error(`Payment not completed. Status: ${details.status}`);
-                    }
+                        if (address1 && city && state && zip) {
+                          const addressObj: any = {
+                            address_line_1: address1,
+                            admin_area_2: city,
+                            admin_area_1: state,
+                            postal_code: zip,
+                            country_code: "US",
+                          };
+                          if (address2 && address2.trim() !== '') {
+                            addressObj.address_line_2 = address2;
+                          }
 
-                    const paymentDetails = { 
-                      method: 'PayPal', 
-                      id: details.id || paypalData?.orderID, 
-                      status: details.status 
-                    };
-                    const orderPayload = { ...data, paymentDetails, totalPrice };
-                    
-                    try {
-                      await fetch('/api/place-order', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(orderPayload)
-                      });
-                    } catch (apiErr) {
-                      console.error("Order notification API error (payment already captured):", apiErr);
-                    }
+                          payload.purchase_units[0].shipping = {
+                            name: {
+                              full_name: `${firstName || ''} ${lastName || ''}`.trim(),
+                            },
+                            address: addressObj,
+                          };
+                        }
+                      }
 
-                    onNext({ paymentDetails });
-                  } catch (err: any) {
-                    console.error("PayPal capture error details:", err);
-                    const formatted = formatPayPalError(err);
-                    setError(`Payment verification failed: ${formatted}`);
-                    setIsProcessing(false);
-                  }
-                }}
-                onError={async (err: any) => {
-                  console.error("PayPal event error details:", err);
-                  const formatted = formatPayPalError(err);
-                  setError(`PayPal Error: ${formatted}`);
-                  setIsProcessing(false);
-                }}
-                onCancel={(cancelData) => {
-                  console.log("PayPal payment cancelled:", cancelData);
-                  setError("Payment was cancelled.");
-                  setIsProcessing(false);
-                }}
-              />
+                      return actions.order.create(payload);
+                    }}
+                    onApprove={async (paypalData, actions) => {
+                      setIsProcessing(true);
+                      setError('');
+                      try {
+                        if (!actions || !actions.order) {
+                          throw new Error("PayPal order action unavailable");
+                        }
 
-            </PayPalScriptProvider>
+                        const details = await actions.order.capture();
+                        console.log("PayPal capture result:", details);
+
+                        if (details.status !== 'COMPLETED') {
+                          throw new Error(`Payment not completed. Status: ${details.status}`);
+                        }
+
+                        const paymentDetails = { 
+                          method: 'PayPal', 
+                          id: details.id || paypalData?.orderID, 
+                          status: details.status 
+                        };
+                        const orderPayload = { ...data, paymentDetails, totalPrice };
+                        
+                        try {
+                          await fetch('/api/place-order', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(orderPayload)
+                          });
+                        } catch (apiErr) {
+                          console.error("Order notification API error (payment already captured):", apiErr);
+                        }
+
+                        onNext({ paymentDetails });
+                      } catch (err: any) {
+                        console.error("PayPal capture error details:", err);
+                        const formatted = formatPayPalError(err);
+                        setError(`Payment verification failed: ${formatted}`);
+                        setIsProcessing(false);
+                      }
+                    }}
+                    onError={async (err: any) => {
+                      console.error("PayPal event error details:", err);
+                      const formatted = formatPayPalError(err);
+                      setError(`PayPal Error: ${formatted}`);
+                      setIsProcessing(false);
+                    }}
+                    onCancel={(cancelData) => {
+                      console.log("PayPal payment cancelled:", cancelData);
+                      setError("Payment was cancelled.");
+                      setIsProcessing(false);
+                    }}
+                  />
+                </PayPalScriptProvider>
+              </div>
+            </>
           )}
 
           <div className={styles.finePrint} style={{ marginTop: '0.5rem' }}>
