@@ -5,6 +5,7 @@ import * as fabric from 'fabric';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import html2canvas from 'html2canvas';
+import { useCart } from '@/context/CartContext';
 import { Type, Shirt, Image as ImageIcon, Shirt as ShirtViewIcon, Download, Eye, AlignLeft, AlignCenter, AlignRight, Bold, Italic, Underline, Palette, Grid } from 'lucide-react';
 import styles from './Design.module.css';
 import { CLIPART_CATEGORIES as BASE_CLIPART_CATEGORIES, CLIPART_DATA as BASE_CLIPART_DATA, ClipartItem } from './clipartData';
@@ -72,6 +73,7 @@ const COLORS = Array.from(new Set([
 
 export default function DesignPage() {
   const router = useRouter();
+  const { setHasCustomDesign } = useCart();
   const [activeTab, setActiveTab] = useState<'shirt' | 'text' | 'image' | 'clipart'>('shirt');
   const [shirtColor, setShirtColor] = useState('#FFFFFF');
   const [isLoaded, setIsLoaded] = useState(false);
@@ -918,6 +920,7 @@ export default function DesignPage() {
         }
       }
 
+      setHasCustomDesign(true);
       router.push('/checkout');
     } catch (err) {
       console.error("Error during checkout:", err);

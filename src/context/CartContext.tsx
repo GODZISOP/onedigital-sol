@@ -16,6 +16,8 @@ export type CartItem = {
 
 interface CartContextType {
   items: CartItem[];
+  hasCustomDesign: boolean;
+  setHasCustomDesign: (val: boolean) => void;
   addToCart: (item: Omit<CartItem, 'id'>) => void;
   removeFromCart: (id: string) => void;
   clearCart: () => void;
@@ -26,7 +28,23 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [hasCustomDesign, setHasCustomDesign] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+
+  const checkCustomDesign = () => {
+    if (typeof window === 'undefined') return false;
+    try {
+      const stored = sessionStorage.getItem('checkoutState');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        const qty = parsed.quantities 
+          ? Object.values(parsed.quantities).reduce((a: any, b: any) => a + (parseInt(b as string) || 0), 0) 
+          : 0;
+        return !!(parsed.frontImage || parsed.backImage || (qty as number) > 0);
+      }
+    } catch (e) {}
+    return false;
+  };
 
   useEffect(() => {
     const stored = sessionStorage.getItem('globalCart');
@@ -37,6 +55,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         console.error('Failed to parse cart', e);
       }
     }
+    setHasCustomDesign(checkCustomDesign());
     setIsLoaded(true);
   }, []);
 
@@ -57,12 +76,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const clearCart = () => {
     setItems([]);
+    setHasCustomDesign(false);
   };
 
-  const cartCount = items.length;
+  const cartCount = items.length + (hasCustomDesign ? 1 : 0);
 
   return (
-    <CartContext.Provider value={{ items, addToCart, removeFromCart, clearCart, cartCount }}>
+    <CartContext.Provider value={{ items, hasCustomDesign, setHasCustomDesign, addToCart, removeFromCart, clearCart, cartCount }}>
       {children}
     </CartContext.Provider>
   );

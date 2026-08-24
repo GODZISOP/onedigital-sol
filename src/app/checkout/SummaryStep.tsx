@@ -11,7 +11,7 @@ interface SummaryStepProps {
 }
 
 export default function SummaryStep({ data, onNext, onUpdate }: SummaryStepProps) {
-  const { items, removeFromCart } = useCart();
+  const { items, removeFromCart, setHasCustomDesign } = useCart();
   const [shippingOption, setShippingOption] = useState<'pickup' | 'normal' | 'rush' | 'super-rush'>('pickup');
   const [error, setError] = useState('');
   
@@ -57,6 +57,7 @@ export default function SummaryStep({ data, onNext, onUpdate }: SummaryStepProps
   };
 
   const handleRemoveCustomDesign = () => {
+    setHasCustomDesign(false);
     const zeroQuantities = { S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0 };
     setLocalQuantities(zeroQuantities);
 
