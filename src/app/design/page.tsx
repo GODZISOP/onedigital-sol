@@ -1456,7 +1456,7 @@ export default function DesignPage() {
             
             <div className={styles.modalFooter}>
               <div className={styles.totalPrice}>
-                ${totalPrice} <small>Free Shipping & Setup</small>
+                ${totalPrice} <small>In-Store Pickup</small>
               </div>
               <button 
                 className={styles.checkoutBtn} 

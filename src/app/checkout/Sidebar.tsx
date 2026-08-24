@@ -33,9 +33,9 @@ export default function Sidebar({ data }: SidebarProps) {
     }
   }
 
-  const getDeliveryDate = (option: string | undefined) => {
-    const minDays = option === 'super-rush' ? 2 : option === 'rush' ? 5 : 7;
-    const maxDays = option === 'super-rush' ? 3 : option === 'rush' ? 7 : 10;
+  const getPickupDate = () => {
+    const minDays = 3;
+    const maxDays = 5;
     const minDate = new Date();
     minDate.setDate(minDate.getDate() + minDays);
     const maxDate = new Date();
@@ -125,8 +125,13 @@ export default function Sidebar({ data }: SidebarProps) {
         )}
 
         <div className={styles.sidebarRow}>
-          <span>Est. Delivery</span>
-          <span>{getDeliveryDate(data.shippingOption)}</span>
+          <span>Fulfillment</span>
+          <span>In-Store Pickup</span>
+        </div>
+
+        <div className={styles.sidebarRow}>
+          <span>Est. Ready Date</span>
+          <span>{getPickupDate()}</span>
         </div>
 
         <div className={styles.sidebarRow} style={{ borderTop: '1px solid #eaeaea', marginTop: '1rem', paddingTop: '1rem' }}>

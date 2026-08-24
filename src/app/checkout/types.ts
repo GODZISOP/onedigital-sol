@@ -15,7 +15,7 @@ export interface CheckoutData {
   backImage?: string;
   leftImage?: string;
   rightImage?: string;
-  shippingOption?: 'normal' | 'rush' | 'super-rush';
+  shippingOption?: 'pickup' | 'normal' | 'rush' | 'super-rush';
   shippingCost?: number;
   finalPrice?: number;
   designColors: string[];

@@ -122,7 +122,7 @@ export default function InstructionsStep({ data, onNext }: InstructionsStepProps
         </div>
 
         <button className={styles.primaryButton} onClick={handleProceed} style={{ marginLeft: 0 }}>
-          Proceed to Shipping Info
+          Proceed to Pickup Info
         </button>
       </div>
 

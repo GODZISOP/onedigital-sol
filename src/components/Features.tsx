@@ -1,4 +1,5 @@
-import { Shirt, Truck, Medal } from 'lucide-react';
+import React from 'react';
+import { Shirt, MapPin, Medal } from 'lucide-react';
 import styles from './Features.module.css';
 
 export default function Features() {
@@ -17,11 +18,11 @@ export default function Features() {
 
         <div className={styles.featureCard}>
           <div className={styles.iconWrapper}>
-            <Truck size={28} strokeWidth={2.5} />
+            <MapPin size={28} strokeWidth={2.5} />
           </div>
           <div className={styles.textContent}>
-            <h3 className={styles.featureTitle}>FREE SHIPPING</h3>
-            <p className={styles.featureDesc}>Over Order $1000</p>
+            <h3 className={styles.featureTitle}>STORE PICKUP</h3>
+            <p className={styles.featureDesc}>781 Tobermory Rd, Fayetteville</p>
           </div>
         </div>
 

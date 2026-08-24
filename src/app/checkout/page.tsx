@@ -10,7 +10,7 @@ import { CheckoutData } from './types';
 import styles from './Checkout.module.css';
 import { useCart } from '@/context/CartContext';
 
-const STEPS = ['Summary', 'Instructions', 'Shipping', 'Payment'];
+const STEPS = ['Summary', 'Instructions', 'Pickup Info', 'Payment'];
 
 export default function CheckoutPage() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -25,6 +25,8 @@ export default function CheckoutPage() {
     if (storedData) {
       try {
         parsedData = JSON.parse(storedData);
+        // Do not let stale items snapshot from checkoutState overwrite live CartContext
+        delete parsedData.items;
         setData(parsedData);
       } catch (err) {
         console.error('Failed to parse checkout state', err);
@@ -70,6 +72,14 @@ export default function CheckoutPage() {
     });
   };
 
+  const handleUpdateData = (updatedData?: any) => {
+    setData((prev: any) => {
+      const newData = { ...prev, ...updatedData };
+      sessionStorage.setItem('checkoutState', JSON.stringify(newData));
+      return newData;
+    });
+  };
+
   const handleStepClick = (index: number) => {
     setCurrentStep(index);
     sessionStorage.setItem('checkoutStep', index.toString());
@@ -101,11 +111,11 @@ export default function CheckoutPage() {
     }
     
     // We pass both the cart items AND the form data to the steps
-    const combinedData = { items, ...data };
+    const combinedData = { ...data, items };
 
     switch (currentStep) {
       case 0:
-        return <SummaryStep data={combinedData} onNext={(updatedData) => handleNext(updatedData)} />;
+        return <SummaryStep data={combinedData} onNext={(updatedData) => handleNext(updatedData)} onUpdate={handleUpdateData} />;
       case 1:
         return <InstructionsStep data={combinedData} onNext={(updatedData) => handleNext(updatedData)} />;
       case 2:
