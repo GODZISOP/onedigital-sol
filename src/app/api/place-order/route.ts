@@ -67,7 +67,7 @@ export async function POST(req: Request) {
           <strong>Name:</strong> ${shippingDetails?.firstName} ${shippingDetails?.lastName}<br/>
           <strong>Email:</strong> ${shippingDetails?.email}<br/>
           <strong>Phone:</strong> ${shippingDetails?.phone}<br/>
-          <strong>Address:</strong> ${shippingDetails?.address1} ${shippingDetails?.address2 || ''}, ${shippingDetails?.city}, ${shippingDetails?.state} ${shippingDetails?.zip}
+          <strong>Order Type:</strong> In-Store Pickup
         </p>
         
         <h3 style="border-bottom: 1px solid #eee; padding-bottom: 5px;">Order Summary</h3>
@@ -208,6 +208,13 @@ export async function POST(req: Request) {
         <p>Hi ${shippingDetails?.firstName},</p>
         <p>We have successfully received your order and payment of <strong>$${parseFloat(String(amountPaid)).toFixed(2)}</strong>.</p>
         
+        <div style="background: #e8f5e9; border: 1px solid #c8e6c9; padding: 15px; border-radius: 5px; margin: 20px 0; text-align: left; color: #2e7d32;">
+          <h3 style="margin-top: 0; color: #2e7d32;">📍 Order Pickup Details</h3>
+          <p style="margin-bottom: 5px;">Your order will be available for pickup at our location:</p>
+          <p style="font-weight: bold; margin-bottom: 5px;"><a href="https://www.google.com/maps/search/?api=1&query=781+Tobermory+Rd,+Fayetteville,+NC+28306" style="color: #2e7d32; text-decoration: underline;" target="_blank">781 Tobermory Rd<br/>Fayetteville, NC 28306</a></p>
+          <p style="margin-bottom: 0;"><strong>Phone:</strong> +1 910-865-1070</p>
+        </div>
+        
         <div style="text-align: left; background: #fafafa; padding: 15px; margin: 20px 0; border-radius: 5px; border: 1px solid #eee;">
           <h3 style="margin-top: 0;">Order Summary</h3>
     `;
@@ -254,7 +261,7 @@ export async function POST(req: Request) {
 
     customerHtml += `
         </div>
-        <p>We are currently processing your items and will notify you once they are shipped.</p>
+        <p>We are currently processing your items and will notify you once they are ready for pickup.</p>
         <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
         <p style="font-size: 12px; color: #888;">If you have any questions, please reply to this email.</p>
       </div>

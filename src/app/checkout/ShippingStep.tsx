@@ -32,7 +32,7 @@ export default function ShippingStep({ data, onNext }: ShippingStepProps) {
   };
 
   const handleProceed = () => {
-    const required = ['firstName', 'lastName', 'address1', 'city', 'state', 'zip', 'phone', 'email'];
+    const required = ['firstName', 'lastName', 'phone', 'email'];
     for (const field of required) {
       if (!formData[field as keyof typeof formData]) {
         setError('Please fill in all required fields before proceeding.');
@@ -59,12 +59,42 @@ export default function ShippingStep({ data, onNext }: ShippingStepProps) {
   return (
     <div className={styles.mainContent}>
       <div className={styles.leftColumn}>
-        <h2 className={styles.pageTitle}>Shipping Information</h2>
+        <h2 className={styles.pageTitle}>Pickup Information</h2>
         
-        <h3 className={styles.sectionTitle} style={{ marginTop: 0 }}>Shipping Address</h3>
-        
+        <div style={{
+          background: '#f8fafc',
+          border: '1px solid #cbd5e1',
+          padding: '1rem',
+          borderRadius: '8px',
+          marginBottom: '1.5rem',
+          color: '#334155'
+        }}>
+          <strong>📍 Pickup Location:</strong><br />
+          781 Tobermory Rd, Fayetteville, NC 28306<br />
+          <br />
+          <strong>📞 Phone:</strong> +1 910-865-1070<br />
+          
+          <div style={{ marginTop: '1rem', borderRadius: '4px', overflow: 'hidden', border: '1px solid #cbd5e1' }}>
+            <iframe 
+              src="https://maps.google.com/maps?q=781+Tobermory+Rd,+Fayetteville,+NC+28306&t=&z=13&ie=UTF8&iwloc=&output=embed" 
+              width="100%" 
+              height="200" 
+              style={{ border: 0 }} 
+              allowFullScreen={false} 
+              loading="lazy" 
+              referrerPolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
+
+          <span style={{ fontSize: '0.9rem', color: '#64748b', display: 'block', marginTop: '0.5rem' }}>
+            (You will also receive this information in your order confirmation email)
+          </span>
+        </div>
+
         {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
 
+        <h3 className={styles.sectionTitle} style={{ marginTop: 0 }}>Who is picking up the order?</h3>
+        
         <div className={styles.formRow}>
           <div className={styles.formGroup} style={{ flex: 1 }}>
             <label className={styles.formLabel}>First Name *</label>
@@ -79,33 +109,6 @@ export default function ShippingStep({ data, onNext }: ShippingStepProps) {
         <div className={styles.formGroup}>
           <label className={styles.formLabel}>Company (optional)</label>
           <input type="text" name="company" className={styles.formInput} style={{ maxWidth: '400px' }} value={formData.company} onChange={handleChange} />
-        </div>
-
-        <div className={styles.formGroup}>
-          <label className={styles.formLabel}>Shipping Address *</label>
-          <input type="text" name="address1" className={styles.formInput} style={{ maxWidth: '400px', marginBottom: '0.5rem' }} value={formData.address1} onChange={handleChange} placeholder="Line 1" />
-          <input type="text" name="address2" className={styles.formInput} style={{ maxWidth: '400px' }} value={formData.address2} onChange={handleChange} placeholder="Line 2 (optional)" />
-        </div>
-
-        <div className={styles.formRow} style={{ maxWidth: '400px' }}>
-          <div className={styles.formGroup} style={{ flex: 2 }}>
-            <label className={styles.formLabel}>City *</label>
-            <input type="text" name="city" className={styles.formInput} value={formData.city} onChange={handleChange} />
-          </div>
-          <div className={styles.formGroup} style={{ flex: 2 }}>
-            <label className={styles.formLabel}>State *</label>
-            <select name="state" className={styles.formInput} value={formData.state} onChange={handleChange}>
-              <option value="">Select...</option>
-              <option value="AR">Arkansas</option>
-              <option value="CA">California</option>
-              <option value="NY">New York</option>
-              <option value="TX">Texas</option>
-            </select>
-          </div>
-          <div className={styles.formGroup} style={{ flex: 1 }}>
-            <label className={styles.formLabel}>Zip Code *</label>
-            <input type="text" name="zip" className={styles.formInput} value={formData.zip} onChange={handleChange} />
-          </div>
         </div>
 
         <h3 className={styles.sectionTitle}>Contact Details</h3>
