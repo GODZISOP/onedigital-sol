@@ -36,16 +36,6 @@ export default function Sidebar({ data }: SidebarProps) {
     }
   }
 
-  const getPickupDate = () => {
-    const minDays = 3;
-    const maxDays = 5;
-    const minDate = new Date();
-    minDate.setDate(minDate.getDate() + minDays);
-    const maxDate = new Date();
-    maxDate.setDate(maxDate.getDate() + maxDays);
-    return `${minDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${maxDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
-  };
-
   const hasCustomDesign = !!(
     data.frontImage || 
     data.backImage || 
@@ -130,11 +120,6 @@ export default function Sidebar({ data }: SidebarProps) {
         <div className={styles.sidebarRow}>
           <span>Fulfillment</span>
           <span>In-Store Pickup</span>
-        </div>
-
-        <div className={styles.sidebarRow}>
-          <span>Est. Ready Date</span>
-          <span>{getPickupDate()}</span>
         </div>
 
         <div className={styles.sidebarRow} style={{ borderTop: '1px solid #eaeaea', marginTop: '1rem', paddingTop: '1rem' }}>
