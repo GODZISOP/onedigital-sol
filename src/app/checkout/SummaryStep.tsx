@@ -403,9 +403,6 @@ export default function SummaryStep({ data, onNext, onUpdate }: SummaryStepProps
               <p style={{ margin: '0.4rem 0 0 0', fontSize: '0.85rem', color: '#475569', lineHeight: 1.4 }}>
                 781 Tobermory Rd, Fayetteville, NC 28306
               </p>
-              <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '0.4rem' }}>
-                Est. Ready: 3 - 5 business days
-              </div>
             </div>
 
             <h3 style={{ marginTop: '2rem' }}>Pricing Breakdown</h3>
