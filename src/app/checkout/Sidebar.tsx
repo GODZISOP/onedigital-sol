@@ -1,4 +1,5 @@
 import React from 'react';
+import { useCart } from '@/context/CartContext';
 import styles from './Checkout.module.css';
 import { CheckoutData } from './types';
 
@@ -7,14 +8,16 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ data }: SidebarProps) {
+  const { items: cartItems } = useCart();
   if (!data) return null;
 
+  const items = cartItems && cartItems.length > 0 ? cartItems : (data.items || []);
   let totalQuantity = 0;
   let baseShirtsPrice = 0;
   const finalPrice = typeof data.finalPrice === 'string' ? parseFloat(data.finalPrice) : (data.finalPrice || 0);
 
-  if (data.items && data.items.length > 0) {
-    data.items.forEach((item: any) => {
+  if (items && items.length > 0) {
+    items.forEach((item: any) => {
       totalQuantity += item.totalQuantity || 0;
     });
   }
@@ -26,8 +29,8 @@ export default function Sidebar({ data }: SidebarProps) {
   if (data.pricingBreakdown) {
     baseShirtsPrice = data.pricingBreakdown.basePrice || 0;
   } else {
-    if (data.items && data.items.length > 0) {
-      data.items.forEach((item: any) => {
+    if (items && items.length > 0) {
+      items.forEach((item: any) => {
         baseShirtsPrice += (item.price * item.totalQuantity) || 0;
       });
     }
@@ -87,9 +90,9 @@ export default function Sidebar({ data }: SidebarProps) {
           </div>
         )}
         
-        {data.items && data.items.length > 0 && (
+        {items && items.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%' }}>
-            {data.items.map((item: any) => (
+            {items.map((item: any) => (
               <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', border: '1px solid #eee', padding: '0.5rem', borderRadius: '4px', backgroundColor: '#fafafa' }}>
                 <img src={item.image} alt={item.name} style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
                 <div style={{ fontSize: '0.85rem' }}>
