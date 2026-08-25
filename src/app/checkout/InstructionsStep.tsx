@@ -14,8 +14,14 @@ export default function InstructionsStep({ data, onNext }: InstructionsStepProps
   const [error, setError] = useState('');
   
   const hasCartItems = data?.items && data.items.length > 0;
-  const hasCustomDesign = !!(data?.frontImage || data?.backImage || data?.leftImage || data?.rightImage);
-  const legacyData = hasCustomDesign ? data : (data?.items?.[0]?.checkoutData || {});
+  const isBase64Image = (str?: string) => typeof str === 'string' && str.startsWith('data:image');
+  const hasCustomDesign = !!(
+    isBase64Image(data?.frontImage) || 
+    isBase64Image(data?.backImage) || 
+    isBase64Image(data?.leftImage) || 
+    isBase64Image(data?.rightImage)
+  );
+  const legacyData = hasCustomDesign ? data : null;
   
   const frontColors = legacyData?.frontColors || legacyData?.designColors || [];
   const backColors = legacyData?.backColors || [];

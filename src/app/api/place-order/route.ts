@@ -5,12 +5,12 @@ import path from 'path';
 export async function POST(req: Request) {
   try {
     const data = await req.json();
-    
-    const { 
-      shippingDetails, 
-      items, 
-      paymentDetails, 
-      finalPrice, 
+
+    const {
+      shippingDetails,
+      items,
+      paymentDetails,
+      finalPrice,
       totalPrice,
       frontImage,
       backImage,
@@ -18,6 +18,7 @@ export async function POST(req: Request) {
       rightImage,
       shirtColor,
       quantities,
+      customQuantities,
       frontColors,
       backColors,
       leftColors,
@@ -47,12 +48,18 @@ export async function POST(req: Request) {
       }
     });
 
+    const isBase64Image = (str?: string) => typeof str === 'string' && str.startsWith('data:image');
+
+    const customQtyCount = customQuantities
+      ? Object.values(customQuantities as Record<string, any>).reduce((a: any, b: any) => a + (parseInt(b as string) || 0), 0)
+      : 0;
+
     const hasCustomDesign = !!(
-      frontImage || 
-      backImage || 
-      leftImage || 
-      rightImage || 
-      (quantities && Object.values(quantities as Record<string, any>).reduce((a: any, b: any) => a + (parseInt(b as string) || 0), 0) > 0)
+      isBase64Image(frontImage) ||
+      isBase64Image(backImage) ||
+      isBase64Image(leftImage) ||
+      isBase64Image(rightImage) ||
+      (customQtyCount > 0 && (shirtColor || isBase64Image(frontImage)))
     );
     const amountPaid = finalPrice || totalPrice || 0;
 
@@ -117,70 +124,66 @@ export async function POST(req: Request) {
     }
 
     const attachments: any[] = [];
-    if (frontImage) {
+    if (isBase64Image(frontImage)) {
       attachments.push({
         filename: 'front-design.png',
         content: frontImage.split('base64,')[1],
         encoding: 'base64',
         cid: 'frontDesign'
       });
-    } else if (hasCustomDesign) {
-      attachments.push({
-        filename: 'blank-front.png',
-        path: path.join(process.cwd(), 'public', 'templates', 'shirt-front.png'),
-        cid: 'frontDesign'
-      });
     }
-    if (backImage) {
+    if (isBase64Image(backImage)) {
       attachments.push({
         filename: 'back-design.png',
         content: backImage.split('base64,')[1],
         encoding: 'base64',
         cid: 'backDesign'
       });
-    } else if (hasCustomDesign) {
-      attachments.push({
-        filename: 'blank-back.png',
-        path: path.join(process.cwd(), 'public', 'templates', 'shirt-back.png'),
-        cid: 'backDesign'
-      });
     }
-    if (leftImage) {
+    if (isBase64Image(leftImage)) {
       attachments.push({
         filename: 'left-design.png',
         content: leftImage.split('base64,')[1],
         encoding: 'base64',
         cid: 'leftDesign'
       });
-    } else if (hasCustomDesign) {
-      attachments.push({
-        filename: 'blank-left.png',
-        path: path.join(process.cwd(), 'public', 'templates', 'shirt-left.png'),
-        cid: 'leftDesign'
-      });
     }
-    if (rightImage) {
+    if (isBase64Image(rightImage)) {
       attachments.push({
         filename: 'right-design.png',
         content: rightImage.split('base64,')[1],
         encoding: 'base64',
         cid: 'rightDesign'
       });
-    } else if (hasCustomDesign) {
-      attachments.push({
-        filename: 'blank-right.png',
-        path: path.join(process.cwd(), 'public', 'templates', 'shirt-right.png'),
-        cid: 'rightDesign'
-      });
     }
 
     if (hasCustomDesign) {
-      const customQty = Object.entries((quantities as Record<string, any>) || {}).map(([s, q]) => `${s}: ${q}`).join(', ');
-      
+      const activeQuantities = customQuantities || (quantities && customQtyCount > 0 ? quantities : null);
+      const customQtyStr = activeQuantities
+        ? Object.entries((activeQuantities as Record<string, any>) || {})
+          .filter(([_, q]) => (parseInt(String(q)) || 0) > 0)
+          .map(([s, q]) => `${s}: ${q}`)
+          .join(', ')
+        : 'N/A';
+
+      const adminPreviews: string[] = [];
+      if (isBase64Image(frontImage)) {
+        adminPreviews.push(`<div style="margin-bottom: 15px;"><p style="margin: 2px 0;"><strong>Front:</strong></p><a href="cid:frontDesign" download="front-design.png"><img src="cid:frontDesign" style="max-width: 150px; height: auto; border: 1px solid #ddd; border-radius: 4px;" alt="Front" /></a></div>`);
+      }
+      if (isBase64Image(backImage)) {
+        adminPreviews.push(`<div style="margin-bottom: 15px;"><p style="margin: 2px 0;"><strong>Back:</strong></p><a href="cid:backDesign" download="back-design.png"><img src="cid:backDesign" style="max-width: 150px; height: auto; border: 1px solid #ddd; border-radius: 4px;" alt="Back" /></a></div>`);
+      }
+      if (isBase64Image(leftImage)) {
+        adminPreviews.push(`<div style="margin-bottom: 15px;"><p style="margin: 2px 0;"><strong>Left Sleeve:</strong></p><a href="cid:leftDesign" download="left-design.png"><img src="cid:leftDesign" style="max-width: 150px; height: auto; border: 1px solid #ddd; border-radius: 4px;" alt="Left Sleeve" /></a></div>`);
+      }
+      if (isBase64Image(rightImage)) {
+        adminPreviews.push(`<div style="margin-bottom: 15px;"><p style="margin: 2px 0;"><strong>Right Sleeve:</strong></p><a href="cid:rightDesign" download="right-design.png"><img src="cid:rightDesign" style="max-width: 150px; height: auto; border: 1px solid #ddd; border-radius: 4px;" alt="Right Sleeve" /></a></div>`);
+      }
+
       adminHtml += `
         <h3 style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 20px;">Custom Design Details</h3>
         <p><strong>Base Shirt Color:</strong> ${shirtColor || 'White'}</p>
-        <p><strong>Quantities by Size:</strong> ${customQty || 'N/A'}</p>
+        <p><strong>Quantities by Size:</strong> ${customQtyStr}</p>
         
         <p><strong>Front Print Colors:</strong> ${frontColors?.length ? frontColors.join(', ') : 'None'}</p>
         <p><strong>Back Print Colors:</strong> ${backColors?.length ? backColors.join(', ') : 'None'}</p>
@@ -189,13 +192,17 @@ export async function POST(req: Request) {
         
         ${instructions ? `<p><strong>Special Instructions:</strong><br/>${instructions}</p>` : ''}
         
-        <h4 style="margin-top: 20px;">Design Images (Click to Download)</h4>
-        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-          <div style="margin-bottom: 15px;"><p><strong>Front:</strong></p><a href="cid:frontDesign" download="front-design.png"><img src="cid:frontDesign" style="max-width: 100%; height: auto; border: 1px solid #ddd;" alt="Front" /></a></div>
-          <div style="margin-bottom: 15px;"><p><strong>Back:</strong></p><a href="cid:backDesign" download="back-design.png"><img src="cid:backDesign" style="max-width: 100%; height: auto; border: 1px solid #ddd;" alt="Back" /></a></div>
-          <div style="margin-bottom: 15px;"><p><strong>Left Sleeve:</strong></p><a href="cid:leftDesign" download="left-design.png"><img src="cid:leftDesign" style="max-width: 100%; height: auto; border: 1px solid #ddd;" alt="Left Sleeve" /></a></div>
-          <div style="margin-bottom: 15px;"><p><strong>Right Sleeve:</strong></p><a href="cid:rightDesign" download="right-design.png"><img src="cid:rightDesign" style="max-width: 100%; height: auto; border: 1px solid #ddd;" alt="Right Sleeve" /></a></div>
-        </div>
+        ${adminPreviews.length > 0 ? `
+          <h4 style="margin-top: 20px;">Design Images (Click to Download)</h4>
+          <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+            ${adminPreviews.join('')}
+          </div>
+        ` : ''}
+      `;
+    } else if (instructions) {
+      adminHtml += `
+        <h3 style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 20px;">Order Notes / Instructions</h3>
+        <p>${instructions}</p>
       `;
     }
 
@@ -239,22 +246,48 @@ export async function POST(req: Request) {
     }
 
     if (hasCustomDesign) {
-      const customQty = Object.entries((quantities as Record<string, any>) || {}).map(([s, q]) => `${s}: ${q}`).join(', ');
-      
+      const activeQuantities = customQuantities || (quantities && customQtyCount > 0 ? quantities : null);
+      const customQtyStr = activeQuantities
+        ? Object.entries((activeQuantities as Record<string, any>) || {})
+          .filter(([_, q]) => (parseInt(String(q)) || 0) > 0)
+          .map(([s, q]) => `${s}: ${q}`)
+          .join(', ')
+        : 'N/A';
+
+      const customerPreviews: string[] = [];
+      if (isBase64Image(frontImage)) {
+        customerPreviews.push(`<div style="text-align: center;"><p style="margin: 2px 0; font-size: 12px; color: #666;">Front</p><img src="cid:frontDesign" style="max-width: 120px; height: auto; border: 1px solid #ddd; border-radius: 4px;" alt="Front" /></div>`);
+      }
+      if (isBase64Image(backImage)) {
+        customerPreviews.push(`<div style="text-align: center;"><p style="margin: 2px 0; font-size: 12px; color: #666;">Back</p><img src="cid:backDesign" style="max-width: 120px; height: auto; border: 1px solid #ddd; border-radius: 4px;" alt="Back" /></div>`);
+      }
+      if (isBase64Image(leftImage)) {
+        customerPreviews.push(`<div style="text-align: center;"><p style="margin: 2px 0; font-size: 12px; color: #666;">Left Sleeve</p><img src="cid:leftDesign" style="max-width: 120px; height: auto; border: 1px solid #ddd; border-radius: 4px;" alt="Left Sleeve" /></div>`);
+      }
+      if (isBase64Image(rightImage)) {
+        customerPreviews.push(`<div style="text-align: center;"><p style="margin: 2px 0; font-size: 12px; color: #666;">Right Sleeve</p><img src="cid:rightDesign" style="max-width: 120px; height: auto; border: 1px solid #ddd; border-radius: 4px;" alt="Right Sleeve" /></div>`);
+      }
+
       customerHtml += `
         <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; text-align: left;">
           <h4 style="margin-top: 0; margin-bottom: 10px; color: #333;">Custom Design Details</h4>
           <p style="margin: 4px 0;"><strong>Base Shirt Color:</strong> ${shirtColor || 'White'}</p>
-          <p style="margin: 4px 0;"><strong>Quantities by Size:</strong> ${customQty || 'N/A'}</p>
+          <p style="margin: 4px 0;"><strong>Quantities by Size:</strong> ${customQtyStr}</p>
           ${instructions ? `<p style="margin: 4px 0;"><strong>Special Instructions:</strong><br/>${instructions}</p>` : ''}
           
-          <h4 style="margin-top: 15px; margin-bottom: 10px; color: #333;">Your Custom Design Previews:</h4>
-          <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
-            <img src="cid:frontDesign" style="max-width: 120px; height: auto; border: 1px solid #ddd; border-radius: 4px;" alt="Front" />
-            <img src="cid:backDesign" style="max-width: 120px; height: auto; border: 1px solid #ddd; border-radius: 4px;" alt="Back" />
-            <img src="cid:leftDesign" style="max-width: 120px; height: auto; border: 1px solid #ddd; border-radius: 4px;" alt="Left Sleeve" />
-            <img src="cid:rightDesign" style="max-width: 120px; height: auto; border: 1px solid #ddd; border-radius: 4px;" alt="Right Sleeve" />
-          </div>
+          ${customerPreviews.length > 0 ? `
+            <h4 style="margin-top: 15px; margin-bottom: 10px; color: #333;">Your Custom Design Previews:</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+              ${customerPreviews.join('')}
+            </div>
+          ` : ''}
+        </div>
+      `;
+    } else if (instructions) {
+      customerHtml += `
+        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; text-align: left;">
+          <h4 style="margin-top: 0; margin-bottom: 10px; color: #333;">Order Notes</h4>
+          <p style="margin: 4px 0;">${instructions}</p>
         </div>
       `;
     }
@@ -301,7 +334,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ success: true, message: "Emails sent successfully." });
-    
+
   } catch (error) {
     console.error("Error sending order emails:", error);
     return NextResponse.json({ success: false, error: "Failed to send emails" }, { status: 500 });

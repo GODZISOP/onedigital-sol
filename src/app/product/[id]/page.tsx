@@ -54,10 +54,10 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       image: product.image,
       checkoutData: {
         pricePerShirt: finalPrice,
-        shirtColor: 'White',
+        shirtColor: '',
         quantities: sizesSelected as any,
         totalPrice: parseFloat((finalPrice * quantity).toFixed(2)),
-        frontImage: product.image,
+        frontImage: '',
         designColors: [],
         frontColors: [],
         backColors: [],

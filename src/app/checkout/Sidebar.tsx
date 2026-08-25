@@ -36,13 +36,17 @@ export default function Sidebar({ data }: SidebarProps) {
     }
   }
 
+  const isBase64Image = (str?: string) => typeof str === 'string' && str.startsWith('data:image');
+  const customQty: number = data.customQuantities 
+    ? (Object.values(data.customQuantities).reduce((a: number, b: any) => a + (parseInt(b as string) || 0), 0) as number)
+    : 0;
+
   const hasCustomDesign = !!(
-    data.frontImage || 
-    data.backImage || 
-    data.leftImage || 
-    data.rightImage || 
-    data.frontColors?.length ||
-    (data.quantities && Object.values(data.quantities).reduce((a: any, b: any) => a + (parseInt(b as string) || 0), 0) > 0)
+    isBase64Image(data.frontImage) || 
+    isBase64Image(data.backImage) || 
+    isBase64Image(data.leftImage) || 
+    isBase64Image(data.rightImage) || 
+    (customQty > 0 && (isBase64Image(data.frontImage) || data.shirtColor))
   );
 
   const currentDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -51,30 +55,20 @@ export default function Sidebar({ data }: SidebarProps) {
     <aside className={styles.rightColumn}>
       <h3 className={styles.sidebarTitle}>Order Overview</h3>
       <div className={styles.sidebarMockups} style={{ flexDirection: 'column', gap: '1rem', overflowY: 'auto', maxHeight: '400px', paddingRight: '0.5rem' }}>
-        {(data.frontImage || data.backImage || data.leftImage || data.rightImage || data.shirtColor) && (
+        {hasCustomDesign && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', width: '100%' }}>
-            {data.frontImage ? (
+            {data.frontImage && isBase64Image(data.frontImage) ? (
               <img src={data.frontImage} alt="Front View" style={{ width: '100%', objectFit: 'contain', border: '1px solid #eee', background: '#fcfcfc', borderRadius: '4px' }} />
-            ) : (
-              <div style={{ position: 'relative', width: '100%', border: '1px solid #eee', background: '#fcfcfc', overflow: 'hidden', aspectRatio: '500/600', borderRadius: '4px' }}>
-                <div style={{ position: 'absolute', inset: 0, backgroundColor: data.shirtColor || '#fff', WebkitMaskImage: 'url(/templates/shirt-front.png)', WebkitMaskSize: 'contain', WebkitMaskPosition: 'center', WebkitMaskRepeat: 'no-repeat', maskImage: 'url(/templates/shirt-front.png)', maskSize: 'contain', maskPosition: 'center', maskRepeat: 'no-repeat' }}></div>
-                <img src="/templates/shirt-front.png" alt="Front Mockup" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
-              </div>
-            )}
+            ) : null}
             
-            {data.backImage ? (
+            {data.backImage && isBase64Image(data.backImage) ? (
               <img src={data.backImage} alt="Back View" style={{ width: '100%', objectFit: 'contain', border: '1px solid #eee', background: '#fcfcfc', borderRadius: '4px' }} />
-            ) : (
-              <div style={{ position: 'relative', width: '100%', border: '1px solid #eee', background: '#fcfcfc', overflow: 'hidden', aspectRatio: '500/600', borderRadius: '4px' }}>
-                <div style={{ position: 'absolute', inset: 0, backgroundColor: data.shirtColor || '#fff', WebkitMaskImage: 'url(/templates/shirt-back.png)', WebkitMaskSize: 'contain', WebkitMaskPosition: 'center', WebkitMaskRepeat: 'no-repeat', maskImage: 'url(/templates/shirt-back.png)', maskSize: 'contain', maskPosition: 'center', maskRepeat: 'no-repeat' }}></div>
-                <img src="/templates/shirt-back.png" alt="Back Mockup" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }} />
-              </div>
-            )}
+            ) : null}
             
-            {data.leftImage && (
+            {data.leftImage && isBase64Image(data.leftImage) && (
               <img src={data.leftImage} alt="Left View" style={{ width: '100%', objectFit: 'contain', border: '1px solid #eee', background: '#fcfcfc', borderRadius: '4px' }} />
             )}
-            {data.rightImage && (
+            {data.rightImage && isBase64Image(data.rightImage) && (
               <img src={data.rightImage} alt="Right View" style={{ width: '100%', objectFit: 'contain', border: '1px solid #eee', background: '#fcfcfc', borderRadius: '4px' }} />
             )}
           </div>

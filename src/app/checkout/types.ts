@@ -8,6 +8,7 @@ export interface CheckoutData {
     '2XL': number;
     '3XL': number;
   };
+  customQuantities?: Record<string, number | string>;
   shirtColor: string;
   pricePerShirt: number;
   totalPrice: number;
